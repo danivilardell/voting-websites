@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>B-Privacy: Defining and Enforcing Privacy in Weighted Voting</title>
+  <meta name="description" content="B-Privacy is a privacy framework for weighted voting that measures the economic cost of bribery under revealed tallies." />
+  <link rel="icon" href="logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="deanonymize.js" defer></script>
+  <script src="plot_data.js" defer></script>
+  <script src="plots.js" defer></script>
+  <script src="bprivacy_game.js" defer></script>
+</head>
+<body>
+  <main class="page">
+
+    <header class="hero">
+      <div class="brand">
+        <img src="logo.svg" alt="B-Privacy logo" class="logo" />
+        <span class="brand-name">B&#8209;Privacy</span>
+      </div>
+
+      <h1 class="title">Defining and Enforcing Privacy in Weighted Voting</h1>
+
+      <p class="authors">
+        <a href="#">Samuel Breckenridge</a><sup>*1,2</sup>,
+        <a href="#">Dani Vilardell</a><sup>*1,2</sup>,
+        <a href="#">Andr&eacute;s F&aacute;brega</a><sup>1,2</sup>,
+        <a href="#">Amy Zhao</a><sup>3,2</sup>,
+        <a href="#">Patrick McCorry</a><sup>4</sup>,
+        <a href="#">Rafael Solari</a><sup>5</sup>,
+        <a href="#">Ari Juels</a><sup>1,2</sup>
+      </p>
+
+      <p class="affiliations">
+        <sup>1</sup>Cornell Tech &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+        <sup>2</sup>IC3 &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+        <sup>3</sup>Ava Labs &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+        <sup>4</sup>Arbitrum Foundation &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+        <sup>5</sup>Tally &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+        <span class="equal-contrib"><sup>*</sup>Equal contribution</span>
+      </p>
+
+      <p class="venue">arXiv:2509.17871 &nbsp;&middot;&nbsp; September 2025</p>
+
+      <nav class="actions">
+        <a class="btn btn-primary" href="https://arxiv.org/pdf/2509.17871" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Paper
+        </a>
+        <a class="btn" href="https://arxiv.org/abs/2509.17871" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          arXiv
+        </a>
+        <a class="btn" href="#bibtex">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          BibTeX
+        </a>
+      </nav>
+    </header>
+
+    <section class="section abstract">
+    <h2>Abstract</h2>
+    <div class="abstract-body">
+    <p>
+      In traditional one-vote-per-person systems, privacy means <em>ballot secrecy</em>: tallies are public, but individual choices stay hidden. Weighted-voting systems, now common in cryptocurrency and web3, break this assumption. We show that <em>publishing raw tallies often reveals how individuals voted, even with secret ballots</em>.
+    </p>
+    <p>
+      Weighted voting therefore needs a new privacy framework. We introduce <strong>B-privacy</strong>, which measures the economic cost for an adversary to bribe voters based on revealed tallies, and propose a mechanism that boosts B-privacy by noising tallies, with provable security bounds on the tradeoff against <em>transparency</em> (tally accuracy).
+    </p>
+    <p>
+      Analyzing 3,582 proposals across 30 DAOs, we find that large voters (<em>"whales"</em>) fundamentally limit any mechanism aimed at increasing B-privacy. Still, for proposals with lower weight concentration, our mechanism raises B-privacy by a geometric mean factor of <strong>4.1×</strong> with low transparency loss, offering the first principled guidance on transparency-privacy tradeoffs in weighted voting.
+    </p>
+    </div>
+      <!-- <p>
+        Weighted-voting systems underpin governance in DAOs and other
+        blockchain-based platforms. Conventional ballot secrecy is not
+        enough in these settings: publishing raw tallies can often reveal
+        how individual voters cast their ballots. We introduce
+        <strong>B&#8209;privacy</strong>, a framework that captures the
+        transparency&ndash;privacy tradeoff through the lens of
+        <em>bribery economics</em>, measuring the economic cost for an
+        adversary to bribe voters to change the outcome, given what a
+        published tally reveals.
+      </p>
+      <p>
+        We propose a mechanism that adds noise to tallies to enforce
+        B&#8209;privacy, and analyze <strong>3,582 proposals across 30
+        DAOs</strong>. We find that voter concentration fundamentally
+        limits achievable privacy: when outcomes hinge on whales, little
+        can be hidden. Yet for proposals whose outcomes require
+        coalitions of five or more voters, our mechanism delivers a
+        geometric&nbsp;mean <strong>4.1&times; increase</strong> in
+        bribery cost.
+      </p> -->
+    </section>
+
+    <section class="section" id="deanonymize">
+      <h2>How a tally betrays ballot secrecy</h2>
+      <p>
+        Suppose an election closes with <strong>17 in favour and 11 against</strong>,
+        cast by five voters:
+        <strong>Alice</strong> (weight&nbsp;12),
+        <strong>Bob</strong> (weight&nbsp;7),
+        <strong>Carol</strong> (weight&nbsp;4),
+        <strong>Dave</strong> (weight&nbsp;3), and
+        <strong>Eve</strong> (weight&nbsp;2).
+        The totals alone force every ballot into the open &mdash; two attacks do the work.
+      </p>
+
+      <div class="deanon" role="region" aria-label="Deanonymization demonstration">
+        <div class="bars">
+          <div class="row">
+            <div class="row-label">In favour</div>
+            <div class="bar bar-a">
+              <div class="seg" data-weight="12" style="--w: 12"><span class="w">12</span></div>
+              <div class="seg" data-weight="3" style="--w: 3"><span class="w">3</span></div>
+              <div class="seg" data-weight="2" style="--w: 2"><span class="w">2</span></div>
+            </div>
+            <div class="row-total">17</div>
+          </div>
+          <div class="row">
+            <div class="row-label">Against</div>
+            <div class="bar bar-b">
+              <div class="seg" data-weight="7" style="--w: 7"><span class="w">7</span></div>
+              <div class="seg" data-weight="4" style="--w: 4"><span class="w">4</span></div>
+            </div>
+            <div class="row-total">11</div>
+          </div>
+        </div>
+
+        <div class="narration" aria-live="polite">
+          <p class="step active" data-step="0">Five ballots, two totals. Alice, Bob, Carol, Dave, and Eve cast in secret &mdash; but who voted for what?</p>
+          <p class="step" data-step="1"><span class="attack-tag whale">Whale attack: </span><b>Alice</b>&rsquo;s weight of 12 can&rsquo;t fit inside a total of 11. &rarr; <span class="vote-a">In favour</span>.</p>
+          <p class="step" data-step="2"><span class="attack-tag whale">Whale attack: </span>Only 5 left on the favour side. <b>Bob</b>&rsquo;s 7 won&rsquo;t fit. &rarr; <span class="vote-b">Against</span>.</p>
+          <p class="step" data-step="3"><span class="attack-tag precision">Precision attack: </span>The remaining {4,&nbsp;3,&nbsp;2} must split into favour&nbsp;=&nbsp;5, against&nbsp;=&nbsp;4. The only subset summing to 4 is {4}, so <b>Carol</b> &rarr; <span class="vote-b">Against</span>, and <b>Dave</b>&nbsp;+&nbsp;<b>Eve</b> &rarr; <span class="vote-a">In favour</span>. <em>Every ballot exposed.</em></p>
+        </div>
+
+        <div class="ledger" aria-label="Revealed ballots">
+          <div class="ledger-chip" data-step="1"><span><b>Alice</b> &middot; w=12</span><em>In favour</em></div>
+          <div class="ledger-chip" data-step="2"><span><b>Bob</b> &middot; w=7</span><em>Against</em></div>
+          <div class="ledger-chip" data-step="3"><span><b>Carol</b> &middot; w=4</span><em>Against</em></div>
+          <div class="ledger-chip" data-step="4"><span><b>Dave</b> &middot; w=3</span><em>In favour</em></div>
+          <div class="ledger-chip" data-step="5"><span><b>Eve</b> &middot; w=2</span><em>In favour</em></div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section" id="dao-attack">
+      <h2>The attack, in the wild</h2>
+      <p>
+        We ran the same deanonymization attack across <strong>3,582 proposals from 30
+        DAOs</strong>. Each bubble below is one DAO &mdash; positioned by
+        the average share of ballots and voting weight an attacker can
+        recover from the raw tally alone. Bubble size encodes the average
+        number of voters per proposal.
+      </p>
+
+      <div class="aggregate-plot-wrap">
+        <div class="aggregate-plot" data-plot="aggregate" aria-label="Per-DAO aggregate deanonymization"></div>
+      </div>
+
+      <p class="caption">
+        Even on average, many DAOs leak a substantial fraction of voting
+        weight from the tally alone.
+      </p>
+    </section>
+
+    <section class="section" id="noise-defense">
+      <h2>Noise as a defense</h2>
+      <p>
+        A straightforward solution to those attacks is to publish a <em>noised</em> tally instead of the
+        raw count: a small amount of calibrated randomness is added to
+        each option&rsquo;s total. While if done correctly the outcome stays the same,
+        the noise shifts the result so the attacker can no longer
+        be sure which weight went where with 100% confidence.
+      </p>
+      <p>
+        We ran the same deanonymization attack on noised tallies, and found that noise 
+        can substantially reduce the fraction of ballots and voting weight an attacker 
+        can recover. 
+      </p>
+
+      <div class="noise-plot-wrap">
+        <div class="noise-plot" data-plot="noise" aria-label="Noise impact comparison"></div>
+        <div class="noise-legend">
+          <span><span class="dot dot-raw"></span>Raw tally</span>
+          <span><span class="dot dot-noise"></span>Noised tally</span>
+          <span><span class="line-arrow"></span>Noise impact</span>
+        </div>
+      </div>
+
+      <p class="caption">
+        Bubbles slide down and to the left: noise reduces both the
+        fraction of ballots leaked and the fraction of voting weight
+        leaked.
+      </p>
+    </section>
+
+
+    <section class="section" id="bprivacy-game">
+      <h2>Privacy as bribery cost</h2>
+      <p>
+        The whale and precision attacks show that tallies can leak, but they are only heuristics. They don't tell us what the <em>strongest</em> adversary can do against a given disclosure rule. For that, we need a well-defined privacy notion. Existing definitions in the token-weighted setting diverge sharply depending on whether they focus on leaked weights or leaked ballots, so we propose a definition that instead captures leakage through its <em>impact on the election</em>: the more a tally reveals, the cheaper it becomes for an adversary to bribe voters into flipping the outcome.
+      </p>
+      <p>
+        <strong>B&#8209;privacy</strong> is the minimum total bribe an adversary must commit to flip an outcome with high confidence, given only what the published tally reveals. Bribes are enforceable only when the adversary can verify compliance from the tally, so the disclosure rule directly sets the price of influence.
+      </p>
+
+      <div class="bribe-lab" aria-label="Bribery game in three tally regimes">
+        <div class="bribe-phase" aria-live="polite">
+          <span class="bribe-phase-step">Phase 1 of 5</span>
+          <span class="bribe-phase-label">The offer</span>
+          <span class="bribe-phase-dots" aria-hidden="true">
+            <span class="dot" data-phase="offer"></span>
+            <span class="dot" data-phase="vote"></span>
+            <span class="dot" data-phase="reveal"></span>
+            <span class="dot" data-phase="verify"></span>
+            <span class="dot" data-phase="verdict"></span>
+          </span>
+        </div>
+
+        <div class="bribe-grid">
+          <article class="bribe-cell" data-mode="public">
+            <header>
+              <h3>Public tally</h3>
+              <p class="bribe-sub">Every ballot is visible (or deanonymizable).</p>
+            </header>
+            <div class="actors">
+              <div class="actor actor-adv">
+                <svg class="avatar" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#1a1a1a"/><text x="20" y="25" text-anchor="middle" fill="#fbfaf7" font-family="serif" font-size="16" font-weight="600">A</text></svg>
+                <span class="actor-name">Adversary</span>
+              </div>
+              <div class="actor actor-voter">
+                <svg class="avatar" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#c9a24a"/><text x="20" y="25" text-anchor="middle" fill="#1a1a1a" font-family="serif" font-size="16" font-weight="600">V</text></svg>
+                <span class="actor-name">Alice &middot; w=3</span>
+              </div>
+            </div>
+            <div class="slot slot-offer" data-phase="offer"><div class="slot-label">1. Offer</div><div class="bubble bubble-adv"><p></p></div></div>
+            <div class="slot slot-vote" data-phase="vote"><div class="slot-label">2. Alice votes</div><div class="bubble bubble-voter"><p></p></div></div>
+            <div class="slot slot-reveal" data-phase="reveal"><div class="slot-label">3. Tally published</div><div class="tally-view"><div class="tally-inner"></div></div></div>
+            <div class="slot slot-verify" data-phase="verify"><div class="slot-label">4. Verification</div><div class="bubble bubble-adv"><p></p></div></div>
+            <div class="slot slot-verdict" data-phase="verdict"><div class="slot-label">5. Outcome</div><div class="verdict"><span class="verdict-tag"></span><span class="verdict-text"></span></div></div>
+          </article>
+
+          <article class="bribe-cell" data-mode="noised">
+            <header>
+              <h3>Noised tally</h3>
+              <p class="bribe-sub">Totals are published with calibrated noise.</p>
+            </header>
+            <div class="actors">
+              <div class="actor actor-adv">
+                <svg class="avatar" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#1a1a1a"/><text x="20" y="25" text-anchor="middle" fill="#fbfaf7" font-family="serif" font-size="16" font-weight="600">A</text></svg>
+                <span class="actor-name">Adversary</span>
+              </div>
+              <div class="actor actor-voter">
+                <svg class="avatar" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#c9a24a"/><text x="20" y="25" text-anchor="middle" fill="#1a1a1a" font-family="serif" font-size="16" font-weight="600">V</text></svg>
+                <span class="actor-name">Alice &middot; w=3</span>
+              </div>
+            </div>
+            <div class="slot slot-offer" data-phase="offer"><div class="slot-label">1. Offer</div><div class="bubble bubble-adv"><p></p></div></div>
+            <div class="slot slot-vote" data-phase="vote"><div class="slot-label">2. Alice votes</div><div class="bubble bubble-voter"><p></p></div></div>
+            <div class="slot slot-reveal" data-phase="reveal"><div class="slot-label">3. Tally published</div><div class="tally-view"><div class="tally-inner"></div></div></div>
+            <div class="slot slot-verify" data-phase="verify"><div class="slot-label">4. Verification</div><div class="bubble bubble-adv"><p></p></div></div>
+            <div class="slot slot-verdict" data-phase="verdict"><div class="slot-label">5. Outcome</div><div class="verdict"><span class="verdict-tag"></span><span class="verdict-text"></span></div></div>
+          </article>
+
+          <article class="bribe-cell" data-mode="private">
+            <header>
+              <h3>Winner&#8209;only</h3>
+              <p class="bribe-sub">Only the winning option is announced.</p>
+            </header>
+            <div class="actors">
+              <div class="actor actor-adv">
+                <svg class="avatar" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#1a1a1a"/><text x="20" y="25" text-anchor="middle" fill="#fbfaf7" font-family="serif" font-size="16" font-weight="600">A</text></svg>
+                <span class="actor-name">Adversary</span>
+              </div>
+              <div class="actor actor-voter">
+                <svg class="avatar" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#c9a24a"/><text x="20" y="25" text-anchor="middle" fill="#1a1a1a" font-family="serif" font-size="16" font-weight="600">V</text></svg>
+                <span class="actor-name">Alice &middot; w=3</span>
+              </div>
+            </div>
+            <div class="slot slot-offer" data-phase="offer"><div class="slot-label">1. Offer</div><div class="bubble bubble-adv"><p></p></div></div>
+            <div class="slot slot-vote" data-phase="vote"><div class="slot-label">2. Alice votes</div><div class="bubble bubble-voter"><p></p></div></div>
+            <div class="slot slot-reveal" data-phase="reveal"><div class="slot-label">3. Tally published</div><div class="tally-view"><div class="tally-inner"></div></div></div>
+            <div class="slot slot-verify" data-phase="verify"><div class="slot-label">4. Verification</div><div class="bubble bubble-adv"><p></p></div></div>
+            <div class="slot slot-verdict" data-phase="verdict"><div class="slot-label">5. Outcome</div><div class="verdict"><span class="verdict-tag"></span><span class="verdict-text"></span></div></div>
+          </article>
+        </div>
+      </div>
+
+      <p class="caption">
+        Same bribe, three tallies. The disclosure rule chooses the
+        contract the adversary can enforce &mdash; and therefore the price
+        of corruption. Even though the bribe was the same, Alice only chose to comply
+        when the bribe was enforceable under the public tally. 
+      </p>
+    </section>
+
+
+    <section class="section" id="aavegotchi-results">
+      <h2>Case study: B&#8209;Privacy in Aavegotchi</h2>
+      <p>
+        To see how B&#8209;privacy behaves on real governance data, we
+        analyse <strong>250 proposals from the Aavegotchi DAO</strong> and
+        measure how relative B&#8209;privacy responds to tally
+        perturbation. We group proposals by their <em>Minimum Decisive
+        Coalition</em> (MDC) &mdash; the smallest set of voters whose
+        combined weight could have changed the outcome &mdash; because
+        proposals with larger MDCs are inherently harder to corrupt.
+      </p>
+
+      <figure class="aave-figure">
+        <img src="figure/plot_clustered_average_aavegotchi.eth.png"
+             alt="Relative B-Privacy versus tally perturbation for Aavegotchi proposals, grouped by MDC cohort."
+             style="width: 100%; max-width: 760px; height: auto;" />
+        <!-- <figcaption>
+          Relative B&#8209;privacy (log scale) as a function of tally
+          perturbation <em>d</em>, averaged within MDC cohorts
+          (1&ndash;10, 10&ndash;20, 20&ndash;30, 30+). Two patterns are
+          clear: B&#8209;privacy rises monotonically with perturbation,
+          and at any fixed perturbation level, proposals with larger MDCs
+          enjoy strictly higher B&#8209;privacy.
+        </figcaption> -->
+      </figure>
+
+      <p class="caption">
+        Even modest noise pays off: across proposals with MDC&nbsp;&ge;&nbsp;5,
+        the geometric mean of relative B&#8209;privacy improves by
+        <strong>&times;4.1</strong>. For elections with less concentrated voting power, 
+        noise can substantially increase the cost of bribery with <strong>&times;1000</strong> 
+        from just a 2% perturbation in proposals with MDC&nbsp;&ge;&nbsp;30.
+      </p>
+    </section>
+
+
+    <section class="section" id="bibtex">
+      <h2>Citation</h2>
+      <pre class="bibtex"><code>@article{breckenridge2025bprivacy,
+  title   = {B-Privacy: Defining and Enforcing Privacy in Weighted Voting},
+  author  = {Breckenridge, Samuel and Vilardell, Dani and F{\'a}brega, Andr{\'e}s
+             and Zhao, Amy and McCorry, Patrick and Solari, Rafael and Juels, Ari},
+  journal = {arXiv preprint arXiv:2509.17871},
+  year    = {2025}
+}</code></pre>
+    </section>
+
+    <footer class="footer">
+      <p>&copy; 2025 The B&#8209;Privacy authors &middot; Released under CC&#8209;BY&#8209;4.0</p>
+    </footer>
+
+  </main>
+</body>
+</html>

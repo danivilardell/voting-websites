@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import pandas; import numpy; print\\(pandas.__version__, numpy.__version__\\)\")",
+      "Bash(python3 export_plot_data.py)"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <rect x="6" y="6" width="108" height="108" rx="18" fill="#1a1a1a"/>
+  <!-- C: thick block letterform with rounded inner cut -->
+  <path d="M 58 30 H 36 C 28 30 22 36 22 44 V 78 C 22 86 28 92 36 92 H 58 V 80 H 40 C 36 80 34 78 34 74 V 48 C 34 44 36 42 40 42 H 58 Z" fill="#f5f0e6"/>
+  <!-- I: thick block letterform with serifs -->
+  <path d="M 70 30 H 96 V 42 H 89 V 80 H 96 V 92 H 70 V 80 H 77 V 42 H 70 Z" fill="#f5f0e6"/>
+  <!-- Accent dot, like a sealed ballot mark -->
+  <circle cx="100" cy="100" r="5" fill="#c9a24a"/>
+  <!-- Decorative dashed line, like a chain link / ledger -->
+  <path d="M 22 102 H 84" stroke="#f5f0e6" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.4"/>
+</svg>
