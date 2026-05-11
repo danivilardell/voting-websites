@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Governance Research</title>
-  <meta name="description" content="Governance Research: Privacy-preserving voting systems and coercion-resistant mechanisms for modern governance." />
+  <meta name="description" content="Governance Research: Secure electronic voting." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -196,15 +196,14 @@
 
     <header class="hero">
       <h1 class="hero-title">Governance Research</h1>
-      <p class="hero-subtitle">Privacy-preserving voting systems and coercion-resistant mechanisms</p>
+      <p class="hero-subtitle">Studying and enforcing secure electronic voting</p>
     </header>
 
     <section class="intro">
       <p>
-        Modern governance systems—from decentralized autonomous organizations (DAOs) to large-scale elections—face fundamental tensions between <strong>transparency</strong>, <strong>privacy</strong>, and <strong>coercion-resistance</strong>. These research projects explore how to design voting systems that simultaneously protect voter privacy, resist bribery and coercion, and maintain public auditability.
-      </p>
+        Online voting systems are increasingly used for consequential decisions, from decentralized autonomous organizations (DAOs) governing billions of dollars to large-scale elections. Yet their security rests on assumptions that often fail in practice: classical voting theory largely ignores token-weighted voting, now standard in blockchain governance, while coercion-resistant protocols typically assume in-person registration, which is impractical online. 
       <p>
-        Below are three complementary approaches to governance security, each addressing different aspects of the voting system challenge.
+        These research projects address both gaps by developing new frameworks and protocols for measuring decentralization, preserving privacy, and resisting bribery in token-weighted online elections.
       </p>
     </section>
 
@@ -224,7 +223,7 @@
         <h2 class="paper-title">B-Privacy</h2>
         <p class="paper-subtitle">Weighted Voting Privacy</p>
         <p class="paper-description">
-          A privacy framework for weighted voting systems that measures the economic cost of bribery under revealed tallies. Proposes mechanisms to boost privacy by noising tallies while maintaining transparency and auditability.
+          A privacy framework for studying the leakage that comes from publishing tallies in token-weighted voting, along with mechanisms to reduce this leakage while preserving transparency.
         </p>
         <p class="paper-meta">Breckenridge, Vilardell, Fábrega, et al. • USENIX 2026</p>
       </a>
@@ -234,13 +233,10 @@
         <h2 class="paper-title">Cast Iron</h2>
         <p class="paper-subtitle">Coercion-Resistant Voting</p>
         <p class="paper-description">
-          A publicly verifiable, fake-credential voting system that achieves coercion-resistance without untappable channels. Enables voters to self-register privately by hiding credentials in blockchain transactions, with no fixed registration window.
+          A publicly verifiable, coercion-resistant voting protocol secure under realistic threat models. It enables voters to self-register privately without requiring an online central registration authority.
         </p>
         <p class="paper-meta">Vilardell, Breckenridge, Fábrega, et al. • Under submission, 2026</p>
       </a>
-
-      
-
     </section>
 
 </body>

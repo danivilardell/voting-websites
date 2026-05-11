@@ -66,16 +66,31 @@
     <section class="section abstract">
     <h2>Abstract</h2>
     <div class="abstract-body">
-    <p>
-      In traditional one-vote-per-person systems, privacy means <em>ballot secrecy</em>: tallies are public, but individual choices stay hidden. Weighted-voting systems, now common in cryptocurrency and web3, break this assumption. We show that <em>publishing raw tallies often reveals how individuals voted, even with secret ballots</em>.
+    <!-- <p>
+      In traditional one-vote-per-person voting systems, privacy means <em>ballot secrecy</em>: tallies are public, but individual choices stay hidden. Weighted-voting systems, now common in cryptocurrency and web3, break this assumption. We show that <em>publishing raw tallies often reveals how individuals voted, even with secret ballots</em>.
     </p>
     <p>
       Weighted voting therefore needs a new privacy framework. We introduce <strong>B-privacy</strong>, which measures the economic cost for an adversary to bribe voters based on revealed tallies, and propose a mechanism that boosts B-privacy by noising tallies, with provable security bounds on the tradeoff against <em>transparency</em> (tally accuracy).
     </p>
     <p>
       Analyzing 3,582 proposals across 30 DAOs, we find that large voters (<em>"whales"</em>) fundamentally limit any mechanism aimed at increasing B-privacy. Still, for proposals with lower weight concentration, our mechanism raises B-privacy by a geometric mean factor of <strong>4.1×</strong> with low transparency loss, offering the first principled guidance on transparency-privacy tradeoffs in weighted voting.
+    </p> -->
+    <p>
+    In traditional, one-vote-per-person voting systems, <em>privacy</em> equates with <em>ballot secrecy</em>: voting tallies are published, but individual voters’ choices are concealed.
     </p>
-    </div>
+    <p>
+    Voting systems that weight votes in proportion to token holdings, though, are now prevalent in cryptocurrency and web3 systems. We show that these weighted-voting systems overturn existing notions of voter privacy. Our experiments demonstrate that even with secret ballots, <em>publishing raw tallies often reveals voters’ choices</em>.
+    </p>
+    <p>
+    Weighted voting thus requires a new framework for privacy. We introduce a notion called <strong>B-privacy</strong> whose basis is bribery, a key problem in voting systems today. B-privacy captures the economic cost to an adversary of bribing voters based on revealed voting tallies.
+    </p>
+    <p>
+    We propose a mechanism to boost B-privacy by <em>noising</em> voting tallies. We prove bounds on its tradeoff between B-privacy and transparency, meaning reported-tally accuracy. Analyzing 3,582 proposals across 30 Decentralized Autonomous Organizations (DAOs), we find that the prevalence of large voters (“whales”) limits the effectiveness of any B-Privacy-enhancing technique. However, our mechanism proves to be effective in cases without extreme voting weight concentration: among proposals requiring coalitions of ≥5 voters to flip outcomes, our mechanism raises B-privacy by a geometric mean factor of <strong>4.1×</strong>.
+    </p>
+    <p>
+    Our work offers the first principled guidance on transparency-privacy tradeoffs in weighted-voting systems, complementing existing approaches that focus on ballot secrecy and revealing fundamental constraints that voting weight concentration imposes on privacy mechanisms.
+    </p>
+  </div>
       <!-- <p>
         Weighted-voting systems underpin governance in DAOs and other
         blockchain-based platforms. Conventional ballot secrecy is not
