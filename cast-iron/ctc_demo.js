@@ -1,233 +1,161 @@
 (function () {
-  const root = document.querySelector('#ctc .ctc-demo');
-  if (!root) return;
+  const feed = document.getElementById('ctc-feed');
+  const input = document.getElementById('ctc-input');
+  const commitBtn = document.getElementById('ctc-commit-btn');
+  const openPanel = document.getElementById('ctc-open-panel');
+  const openBtn = document.getElementById('ctc-open-btn');
+  const verifyBox = document.getElementById('ctc-verify');
+  if (!feed || !input || !commitBtn) return;
 
-  const feed = root.querySelector('#ctc-feed');
-  const steps = root.querySelectorAll('.ctc-narration .ctc-step');
-
-  const prefersReduced = window.matchMedia &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // ---------- Pseudo-random hex generator ----------
-  // Deterministic so reloads produce the same sample feed.
-  let rngState = 0xc0ffee;
-  function rand() {
-    rngState = (rngState * 1664525 + 1013904223) >>> 0;
-    return rngState;
-  }
-  function hex(len) {
+  // ---------- Random hex ----------
+  function randHex(len) {
     const chars = '0123456789abcdef';
     let s = '';
-    for (let i = 0; i < len; i++) s += chars[rand() % 16];
+    for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * 16)];
     return s;
   }
-  function shortAddr() {
-    return '0x' + hex(4) + '…' + hex(4);
-  }
-  function nonceShort() {
-    return '0x' + hex(6) + '…' + hex(4);
-  }
+  function shortAddr() { return '0x' + randHex(4) + '…' + randHex(4); }
+  function randNonce() { return '0x' + randHex(8) + '…' + randHex(6); }
   function fakeAmount() {
-    const presets = ['12.40 USDT', '187.00 USDT', '4.31 USDT', '0.85 USDT', '52.10 USDT', '230.00 USDT', '0.07 USDT', '8.42 USDT'];
-    return presets[rand() % presets.length];
+    const v = (Math.random() * 250 + 0.01).toFixed(2);
+    return v + ' USDT';
   }
 
-  // The "real" CTC values shown when opened.
-  // m is a voting credential bound to the voter's IC; r is fresh randomness.
-  const REAL_CTC = {
-    nonce: '0xb4c1…2a7e',                    // the on-chain nonce (truncated)
-    m: 'σ_reg = Sign(IC.sk, (vk, IC.pk))',   // the registration message
-    r: '0x' + 'fc09a1' + '…' + 'd817',       // the randomness
-    hash: 'H(m ∥ r) = 0xb4c1…2a7e'      // the resulting commitment
-  };
-
-  // ---------- Build a fixed sample of 8 transactions ----------
-  const TX_COUNT = 8;
-  const HIGHLIGHT_INDEX = 4; // 0-based position of the CTC in the visible feed
-
-  function makeTx(i, isCtc) {
-    const block = 28_500_000 + i * 3 + (rand() % 3);
-    const idx = rand() % 200;
-    return {
-      from: shortAddr(),
-      to: shortAddr(),
-      amount: fakeAmount(),
-      nonce: isCtc ? REAL_CTC.nonce : nonceShort(),
-      block,
-      idx,
-      isCtc
-    };
-  }
-
-  const TRANSACTIONS = [];
-  for (let i = 0; i < TX_COUNT; i++) {
-    TRANSACTIONS.push(makeTx(i, i === HIGHLIGHT_INDEX));
-  }
-
-  function buildTxRow(tx) {
-    const row = document.createElement('div');
-    row.className = 'ctc-tx';
-    row.setAttribute('role', 'listitem');
-    if (tx.isCtc) row.dataset.ctc = '1';
-
-    const main = document.createElement('div');
-    main.className = 'ctc-tx-line';
-    main.innerHTML = `
-      <span class="ctc-tx-cell"><span class="ctc-key">from</span><span class="ctc-val">${tx.from}</span></span>
-      <span class="ctc-tx-cell"><span class="ctc-key">to</span><span class="ctc-val">${tx.to}</span></span>
-      <span class="ctc-tx-cell"><span class="ctc-key">amt</span><span class="ctc-val">${tx.amount}</span></span>
-      <span class="ctc-tx-cell"><span class="ctc-key">r&sigma;</span><span class="ctc-val ctc-nonce">${tx.nonce}</span></span>
-    `;
-
-    const meta = document.createElement('span');
-    meta.className = 'ctc-tx-block';
-    meta.textContent = `blk ${tx.block.toLocaleString()} · ${tx.idx}`;
-
-    row.appendChild(main);
-    row.appendChild(meta);
-
-    if (tx.isCtc) {
-      const reveal = document.createElement('div');
-      reveal.className = 'ctc-tx-reveal';
-      reveal.innerHTML = `
-        <span class="rv-line"><span class="rv-key">m</span><span class="rv-val">${REAL_CTC.m}</span></span>
-        <span class="rv-line"><span class="rv-key">r</span><span class="rv-val">${REAL_CTC.r}</span></span>
-        <span class="rv-line"><span class="rv-key">commitment</span><span class="rv-val">${REAL_CTC.hash}</span></span>
-        <span class="rv-line"><span class="rv-key">match</span><span class="rv-val">on-chain r&sigma; <span class="rv-arrow">=</span> H(m ∥ r) ✓</span></span>
-      `;
-      row.appendChild(reveal);
+  // ---------- Simple hash (FNV-1a → hex) for demo ----------
+  function simpleHash(str) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 0x01000193);
     }
-
-    return row;
+    const h2 = Math.imul(h, 0x5bd1e995) ^ (h >>> 15);
+    const a = (h >>> 0).toString(16).padStart(8, '0');
+    const b = (h2 >>> 0).toString(16).padStart(8, '0');
+    return a + b + a.split('').reverse().join('') + b.split('').reverse().join('');
   }
 
-  // ---------- Animation timing ----------
-  const APPEAR_GAP    = 220;   // delay between each tx appearing
-  const HIGHLIGHT_AT  = 1100;  // after all visible: hold, then highlight
-  const OPEN_AT       = 2400;  // after highlight: hold, then open
-  const HOLD_FINAL    = 6000;  // hold the opened state before resetting
-  const RESET_GAP     = 900;   // brief blank before next cycle
+  // ---------- State ----------
+  const TX_COUNT = 8;
+  const CTC_INDEX = 4;
+  let committedMessage = '';
+  let randomness = '';
+  let commitmentHash = '';
 
-  let timers = [];
-  let cancelled = false;
-  let running = false;
-
-  function clearTimers() {
-    timers.forEach(t => clearTimeout(t));
-    timers = [];
-  }
-  function schedule(fn, delay) {
-    const id = setTimeout(() => { if (!cancelled) fn(); }, delay);
-    timers.push(id);
+  function truncate(s, pre, suf) {
+    if (s.length <= pre + suf + 1) return s;
+    return s.slice(0, pre) + '…' + s.slice(-suf);
   }
 
-  function setStep(i) {
-    steps.forEach((s, idx) => s.classList.toggle('active', idx === i));
-  }
-
+  // ---------- Build transactions ----------
   function buildFeed() {
     feed.innerHTML = '';
-    TRANSACTIONS.forEach(tx => feed.appendChild(buildTxRow(tx)));
-  }
 
-  function showAllVisible() {
-    feed.querySelectorAll('.ctc-tx').forEach(r => r.classList.add('visible'));
-  }
+    for (let i = 0; i < TX_COUNT; i++) {
+      const isCtc = i === CTC_INDEX && committedMessage;
+      const block = (28_500_000 + Math.floor(Math.random() * 50)).toLocaleString();
+      const nonce = isCtc ? '0x' + truncate(commitmentHash, 8, 6) : randNonce();
 
-  function highlightCtc() {
-    const ctc = feed.querySelector('.ctc-tx[data-ctc="1"]');
-    if (ctc) ctc.classList.add('highlight');
-  }
+      const row = document.createElement('div');
+      row.className = 'ctc-tx';
+      row.setAttribute('role', 'listitem');
+      if (isCtc) row.dataset.ctc = '1';
 
-  function openCtc() {
-    const ctc = feed.querySelector('.ctc-tx[data-ctc="1"]');
-    if (ctc) {
-      ctc.classList.remove('highlight');
-      ctc.classList.add('opened');
+      row.innerHTML =
+        '<div class="ctc-tx-line">' +
+          '<span class="ctc-tx-cell"><span class="ctc-key">from</span><span class="ctc-val">' + shortAddr() + '</span></span>' +
+          '<span class="ctc-tx-cell"><span class="ctc-key">to</span><span class="ctc-val">' + shortAddr() + '</span></span>' +
+          '<span class="ctc-tx-cell"><span class="ctc-key">amt</span><span class="ctc-val">' + fakeAmount() + '</span></span>' +
+          '<span class="ctc-tx-cell"><span class="ctc-key">nonce</span><span class="ctc-val ctc-nonce">' + nonce + '</span></span>' +
+        '</div>' +
+        '<span class="ctc-tx-block">blk ' + block + '</span>';
+
+      feed.appendChild(row);
     }
-  }
 
-  function resetCtc() {
-    const ctc = feed.querySelector('.ctc-tx[data-ctc="1"]');
-    if (ctc) ctc.classList.remove('highlight', 'opened');
-    feed.querySelectorAll('.ctc-tx').forEach(r => r.classList.remove('visible'));
-  }
-
-  function showFinal() {
-    buildFeed();
-    showAllVisible();
-    highlightCtc();
-    openCtc();
-    setStep(3);
-  }
-
-  function runCycle() {
-    if (cancelled) return;
-    buildFeed();
-    setStep(0);
-
-    // Stagger appearance of each transaction
-    const rows = feed.querySelectorAll('.ctc-tx');
-    rows.forEach((r, i) => {
-      schedule(() => r.classList.add('visible'), 200 + i * APPEAR_GAP);
+    var rows = feed.querySelectorAll('.ctc-tx');
+    rows.forEach(function (r, i) {
+      setTimeout(function () { r.classList.add('visible'); }, 100 + i * 140);
     });
-    const allVisibleAt = 200 + (rows.length - 1) * APPEAR_GAP + 400;
-
-    // Step 1: highlight
-    schedule(() => {
-      setStep(1);
-      highlightCtc();
-    }, allVisibleAt + HIGHLIGHT_AT);
-
-    // Step 2: open
-    schedule(() => {
-      setStep(2);
-      openCtc();
-    }, allVisibleAt + HIGHLIGHT_AT + OPEN_AT);
-
-    // Step 3: key-insight call out
-    schedule(() => {
-      setStep(3);
-    }, allVisibleAt + HIGHLIGHT_AT + OPEN_AT + 2400);
-
-    // Reset
-    schedule(() => {
-      resetCtc();
-      schedule(runCycle, RESET_GAP);
-    }, allVisibleAt + HIGHLIGHT_AT + OPEN_AT + HOLD_FINAL);
   }
 
-  function play() {
-    if (running) return;
-    running = true;
-    cancelled = false;
-    if (prefersReduced) { showFinal(); return; }
-    runCycle();
+  // ---------- Commit ----------
+  function doCommit() {
+    var msg = input.value.trim();
+    if (!msg) return;
+
+    committedMessage = msg;
+    randomness = randHex(16);
+    commitmentHash = simpleHash(msg + '||' + randomness);
+    input.disabled = true;
+    commitBtn.disabled = true;
+
+    if (openPanel) openPanel.classList.remove('visible');
+    if (verifyBox) { verifyBox.classList.remove('visible'); verifyBox.innerHTML = ''; }
+
+    buildFeed();
+
+    setTimeout(function () {
+      if (openPanel) openPanel.classList.add('visible');
+    }, 100 + TX_COUNT * 140 + 400);
   }
 
-  function pause() {
-    cancelled = true;
-    running = false;
-    clearTimers();
+  // ---------- Open ----------
+  function doOpen() {
+    if (!committedMessage) return;
+    if (openPanel) openPanel.classList.remove('visible');
+
+    var recomputed = simpleHash(committedMessage + '||' + randomness);
+    var match = recomputed === commitmentHash;
+    var nonceDisplay = '0x' + truncate(commitmentHash, 8, 6);
+
+    // Step 1: Show the revealed values (the "opening")
+    if (verifyBox) {
+      verifyBox.innerHTML =
+        '<div class="ctc-verify-box">' +
+          '<div class="ctc-verify-header">Opening revealed:</div>' +
+          '<span class="ctc-verify-line"><span class="ctc-verify-key">message (m)</span><span class="ctc-verify-val">' + committedMessage + '</span></span>' +
+          '<span class="ctc-verify-line"><span class="ctc-verify-key">randomness (r)</span><span class="ctc-verify-val">0x' + randomness + '</span></span>' +
+          '<div class="ctc-verify-result" id="ctc-verify-step2"></div>' +
+        '</div>';
+      verifyBox.classList.add('visible');
+    }
+
+    // Step 2: After a beat, compute and verify against the on-chain nonce
+    setTimeout(function () {
+      var step2 = document.getElementById('ctc-verify-step2');
+      if (!step2) return;
+
+      step2.innerHTML =
+        '<div class="ctc-verify-header">Verification:</div>' +
+        '<span class="ctc-verify-line"><span class="ctc-verify-key">H(m || r)</span><span class="ctc-verify-val">0x' + truncate(recomputed, 8, 6) + '</span></span>' +
+        '<span class="ctc-verify-line"><span class="ctc-verify-key">on-chain nonce</span><span class="ctc-verify-val">' + nonceDisplay + '</span></span>' +
+        '<span class="ctc-verify-line"><span class="ctc-verify-key">result</span><span class="ctc-verify-val ctc-verify-match">' + (match ? 'H(m || r) = nonce  ✓  Commitment verified' : 'mismatch ✗') + '</span></span>';
+      step2.classList.add('ctc-verify-step2-visible');
+
+      // Highlight the CTC transaction
+      var ctcRow = feed.querySelector('.ctc-tx[data-ctc="1"]');
+      if (ctcRow) {
+        ctcRow.classList.add('highlight');
+        setTimeout(function () {
+          ctcRow.classList.remove('highlight');
+          ctcRow.classList.add('opened');
+          var reveal = document.createElement('div');
+          reveal.className = 'ctc-tx-reveal';
+          reveal.innerHTML =
+            '<span class="rv-line"><span class="rv-key">m</span><span class="rv-val">' + committedMessage + '</span></span>' +
+            '<span class="rv-line"><span class="rv-key">r</span><span class="rv-val">0x' + randomness + '</span></span>' +
+            '<span class="rv-line"><span class="rv-key">H(m || r)</span><span class="rv-val">0x' + truncate(recomputed, 8, 6) + '</span></span>' +
+            '<span class="rv-line"><span class="rv-key">match</span><span class="rv-val">nonce <span class="rv-arrow">=</span> H(m || r) ✓</span></span>';
+          ctcRow.appendChild(reveal);
+        }, 600);
+      }
+    }, 1200);
   }
 
-  // Initial build (hidden)
-  buildFeed();
-
-  if (prefersReduced) {
-    showFinal();
-    return;
-  }
-
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) play();
-        else pause();
-      });
-    }, { threshold: 0.2 });
-    io.observe(root);
-  } else {
-    play();
-  }
+  // ---------- Events ----------
+  commitBtn.addEventListener('click', doCommit);
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') doCommit();
+  });
+  if (openBtn) openBtn.addEventListener('click', doOpen);
 })();

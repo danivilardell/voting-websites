@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="style.css" />
   <script src="ctc_demo.js" defer></script>
   <script src="timeline.js" defer></script>
+  <script src="voter_sim.js" defer></script>
   <script src="coco_plot.js" defer></script>
 </head>
 <body>
@@ -59,110 +60,66 @@
     </header>
 
     <section class="section abstract">
-      <h2>Abstract</h2>
+      <h2>Summary</h2>
       <div class="abstract-body">
         <p>
-          <em>Coercion-resistance</em> (CR) is the gold-standard property of secure voting: voters can cast ballots reflecting their true preferences even under active interaction with an adversary. Existing CR voting schemes face a fundamental tradeoff: <em>fake-credential</em> schemes need <strong>untappable channels</strong> for registration making them impractical, while <em>deniable revoting</em> schemes only achieve a weaker CR notion that is not sufficient in online voting.
+          <em>Coercion-resistance</em> (CR) ensures that voters can cast ballots freely despite adversarial bribery or coercion. Existing CR schemes face a fundamental tradeoff: fake-credential schemes achieve strong CR but require <strong>untappable channels</strong>, while deniable revoting schemes achieve only weak CR in online settings.
         </p>
         <p>
-          We close this gap with <strong>Cast Iron</strong>, the first publicly verifiable fake-credential voting system without untappable channels. At its heart is a new primitive, the <strong>Covert Timestamped Commitment</strong> (CTC), which lets voters <em>self-register</em> privately by covertly hiding the registration inside public traffic; with no registration authority, and at any time, even years before an election takes place.
+          We close this gap with <strong>Cast Iron</strong>, the first publicly verifiable, fake-credential voting system without untappable channels. At its heart is a new primitive, the <strong>Covert Timestamped Commitment</strong> (CTC), which lets voters privately register secret voting credentials on a public blockchain &mdash; at any time, even far in advance of an election &mdash; without a central registration authority.
         </p>
         <p>
-          We prove security in the UC framework, implement a prototype that verifiably tallies <strong>1&nbsp;million ballots in ~1,350 core-hours</strong> (under <strong>$100</strong> on commodity cloud), and introduce <strong>CoCo</strong>, a unifying economic metric of CR. Under CoCo, Cast Iron achieves a <strong>25&times;</strong> cost-of-coercion advantage over comparable revoting protocols in the fully online setting.
+          We prove security in the UC framework, implement a prototype that verifiably tallies <strong>1&nbsp;million ballots in ~1,350 core-hours</strong> (under <strong>$100</strong> on commodity cloud), and introduce <strong>CoCo</strong> (Cost of Coercion), a protocol-agnostic metric for comparing CR across schemes. Under CoCo, Cast Iron outperforms prior schemes in the fully online setting.
         </p>
       </div>
     </section>
 
     <section class="section" id="challenge">
-      <h2>The challenge of online voting</h2>
+      <h2>The challenge of coercion-resistance</h2>
       <p>
-        Online voting makes coercion greatly scalable. Smart-contract platforms have spawned vote-buying marketplaces worth millions; ballot secrecy alone does nothing to stop them, since a voter can <em>provably</em> decrypt their ballot for a briber, showing compliance in order to get the payout. Coercion-resistance instead aims to give voters a way to evade adversarial pressure even while interacting with the adversary. Coercion-resistance protects against such attacks. Since its introduction in 2005, two design philosophies to achieve this property have emerged, and each with its own tradeoffs.
+        In online voting, an adversary seeking to subvert an election can interact with voters remotely to bribe or coerce them, making these attacks more practical. Preventing such attacks requires a stronger security notion than simply ballot secrecy: a voter must be unable to prove their voting behavior to an adversary, even if they can interact arbitrarily. A voting system that satisfies this notion is said to be coercion-resistant. Since the introduction of this concept in 2005, two decades of research has aimed to develop practical coercion-resistant voting systems, and two broad design philosophies to achieve this property have emerged, each with its own tradeoffs.
       </p>
 
       <div class="dilemma">
         <article class="dilemma-card">
-          <div class="dilemma-tag">Approach&nbsp;A</div>
-          <h3>Fake credentials</h3>
-          <p class="dilemma-mech">When coerced, the voter hands over a credential that <em>looks real</em> but is silently invalid. The briber has no way to tell.</p>
-          <p class="dilemma-issue"><span class="dilemma-issue-label">Catch:</span> the voter must register their <em>real</em> credential through an <strong>untappable channel</strong> &mdash; a channel that produces no transcript at all. Practical only in person, or with special-purpose hardware.</p>
+          <div class="dilemma-tag">Approach&nbsp;A &mdash; Fake credentials</div>
+          <p class="dilemma-mech">When coerced, the voter hands over a <em>fake</em> credential that <em>looks real</em>. The adversary has no way of telling whether the voter complied.</p>
+          <p class="dilemma-issue"><span class="dilemma-issue-label">Catch:</span> The voter must first register their real credential through an <strong>untappable channel</strong> &mdash; one that generates no transcript. Only practical in person or with special hardware.</p>
         </article>
 
         <article class="dilemma-card">
-          <div class="dilemma-tag">Approach&nbsp;B</div>
-          <h3>Deniable revoting</h3>
-          <p class="dilemma-mech">If coerced into casting a ballot, the voter quietly casts another later. The latest ballot wins.</p>
-          <p class="dilemma-issue"><span class="dilemma-issue-label">Catch:</span> if the adversary is online at the close of the election, they can simply <strong>race the voter</strong> to cast last. Recent work&nbsp;[Loki] tried to fix this and was promptly broken by brute-force and statistical attacks.</p>
+          <div class="dilemma-tag">Approach&nbsp;B &mdash; Deniable revoting</div>
+          <p class="dilemma-mech">When coerced, the voter complies but later casts a ballot that overrides the coerced one. The adversary cannot tell whether a voter revoted because this process is <em>deniable</em>.</p>
+          <p class="dilemma-issue"><span class="dilemma-issue-label">Catch:</span> The adversary must not be able to coerce a voter at election close, as otherwise they can <em>race</em> the voter to cast the last ballot. Not a practical assumption online.</p>
         </article>
       </div>
 
-      <p class="bridge">
-        Cast Iron sits squarely in the gap. It is a fake-credential scheme, but it does not require an untappable channel. The trick is to look closely at what the untappable channel was actually buying us.
-      </p>
+      <div class="castiron-bridge" aria-hidden="true">
+        <div class="castiron-connector"></div>
+      </div>
+      <article class="dilemma-card castiron-card">
+        <div class="dilemma-tag castiron-tag">Cast Iron</div>
+        <p class="dilemma-mech">A fake-credential scheme that replaces the untappable channel with <strong>covert self-registration</strong>. Voters register their own credentials by embedding them covertly in ordinary blockchain transactions.</p>
+      </article>
     </section>
 
     <section class="section" id="insight">
-      <h2>How to secure a registration</h2>
+      <h2>Covert Self-Registration</h2>
       <p>
-        Fake-credential CR fundamentally requires that the adversary cannot distinguish a voter who registered a credential from one who did not. Untappable channels achieve this by hiding the registration transcript entirely. But the same indistinguishability can be achieved a different way:
+        Fake-credential schemes require that an adversary cannot distinguish a voter who registered a credential from one who did not. Untappable channels achieve this by hiding the registration transcript entirely. This is sufficient but not necessary: instead we can leave the transcript in plain sight, but ensure an adversary cannot tell whose transcript it is, or even whether it represents a registration at all.
       </p>
-      <blockquote class="pull-quote">
-        Even with cooperation between the adversary and the voter, given the publicly available transcript, the adversary should not be able to tell whether a voter has registered or not.
-      </blockquote>
       <p>
-        An untappable channel trivially achieves that, as it does not leak any information about the communiation between the voter and the registration authority. Such untappable channel however is not reasonable in online elections, as registration will always leak at least the network traffic. Cast Iron realizes this through <em>covert self-registration</em>. There is no registrar. Voters generate their own voting credentials and post them anonymously to a public blockchain &mdash; in a form indistinguishable from ordinary transactions already flowing through the chain. The adversary sees the same transactions everyone else sees, and has no way to tell which one (if any) is a registration.
-      </p>
-    </section>
-
-    <section class="section" id="ctc">
-      <h2>Covert Timestamped Commitments</h2>
-      <p>
-        The primitive that powers Cast Iron is a <strong>Covert Timestamped Commitment (CTC)</strong>: a way to commit to a value at a verifiable time without leaving any sign that you committed. Our construction hides the commitment inside the <em>ECDSA signature nonce</em> of an otherwise ordinary blockchain transaction. The nonce is uniformly random under the elliptic-curve discrete log, so a hash-based commitment slots in perfectly &mdash; the resulting transaction is computationally indistinguishable from background traffic.
-      </p>
-
-      <div class="ctc-demo" aria-label="Covert Timestamped Commitment demonstration">
-        <div class="ctc-stage">
-          <div class="ctc-feed-label">
-            <span class="ctc-chain-name">Live blockchain feed</span>
-            <span class="ctc-chain-sub">balance-emptying transfers, recent blocks</span>
-          </div>
-          <div class="ctc-feed" id="ctc-feed" role="list"></div>
-        </div>
-
-        <div class="ctc-narration" aria-live="polite">
-          <p class="ctc-step active" data-step="0">
-            Every transaction here looks the same: a sender, a recipient, a value, and an ECDSA signature whose nonce is a random-looking number. Most are normal transfers.
-          </p>
-          <p class="ctc-step" data-step="1">
-            <span class="ctc-tag">One of these is a CTC. </span>The voter has chosen the signature nonce <code>r&sigma;</code> to be a hash-based commitment <code>H(m &Vert; r)</code> &mdash; where <code>m</code> is their secret voting credential.
-          </p>
-          <p class="ctc-step" data-step="2">
-            <span class="ctc-tag ctc-tag-reveal">Open. </span>The voter reveals <code>(m, r)</code> to a verifier, who recomputes the commitment and confirms the on-chain signature was produced with that exact nonce. The block height pins down <em>when</em> the commitment was made.
-          </p>
-          <p class="ctc-step" data-step="3">
-            <span class="ctc-tag ctc-tag-key">Key insight. </span>From the outside, every transaction looks alike. The adversary observes the chain and gains <em>no</em> information about who, if anyone, registered a credential.
-          </p>
-        </div>
-      </div>
-
-      <p class="caption">
-        On Tron, ~5 such balance-emptying transactions arrive per block. A 1-minute window therefore yields a registration anonymity set of ~100, translating to a <strong>25&times;</strong> cost-of-coercion advantage. A full day yields ~144,000, pushing the advantage past <strong>900&times;</strong>.
-      </p>
-    </section>
-
-    <section class="section" id="timeline">
-      <h2>An election with no registration window</h2>
-      <p>
-        Removing the registration authority does more than simplify deployment: it removes the <em>registration window</em> entirely. In existing fake-credential schemes the voter must register inside a fixed window, before voting opens. The adversary therefore has a fixed moment they can race to. In Cast Iron, the only constraint on registration is that it happen after the voter's inalienable credential exists &mdash; potentially years before an election is even announced.
+        In <strong>covert self-registration</strong>, voters generate and post their own voting credentials anonymously to a public bulletin board, with no involvement from a registration authority, and registrations are disguised as ordinary blockchain transactions. Because there is no registration authority, registration is not confined to a designated window: a voter may register at any time after their inalienable credential is created, potentially long before any election is announced.
       </p>
 
       <div class="timeline-stage" aria-label="Election timeline comparison">
         <div class="tl-track" data-track="existing">
           <div class="tl-track-label">
             <span class="tl-track-name">Existing fake-credential schemes</span>
-            <span class="tl-track-sub">registration window with a registrar</span>
+            <span class="tl-track-sub">fixed registration window with an authority</span>
           </div>
           <div class="tl-canvas">
-            <svg viewBox="0 0 800 130" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+            <svg viewBox="0 0 800 170" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
           </div>
         </div>
 
@@ -172,70 +129,80 @@
             <span class="tl-track-sub">register anytime, no authority</span>
           </div>
           <div class="tl-canvas">
-            <svg viewBox="0 0 800 130" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+            <svg viewBox="0 0 800 170" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
           </div>
         </div>
 
-        <div class="tl-narration" aria-live="polite">
-          <p class="tl-step active" data-step="0">
-            Both timelines start the same way: the voter's <strong>inalienable credential</strong> is created at <code>t&#x2080;</code>, and the election ends with tallying.
-          </p>
-          <p class="tl-step" data-step="1">
-            In existing schemes, the voter must interact with a <strong>registrar&nbsp;R</strong> during a prescribed window <code>[t<sub>R</sub>, t&#x2081;]</code>. The adversary knows the window and can station themselves at its start.
-          </p>
-          <p class="tl-step" data-step="2">
-            In Cast Iron, registration is a single <strong>self-issued post</strong> to the bulletin board &mdash; possible at any time after <code>t&#x2080;</code>. The voter may have registered before any coercion attempt, or any election announcement.
-          </p>
-          <p class="tl-step" data-step="3">
-            <span class="tl-tag">Why it matters. </span>The unbounded window means the adversary can never identify a moment at which voters are guaranteed to be unregistered. No matter how quickly they act, the voter could already have registered &mdash; whether or not they actually did.
-          </p>
-        </div>
+        <div class="tl-description" id="tl-description">Hover over elements in the diagram to learn more.</div>
       </div>
+    </section>
+
+    <section class="section" id="ctc">
+      <h2>Covert Timestamped Commitments</h2>
+      <p>
+        The primitive that enables covert self-registration is a <strong>Covert Timestamped Commitment</strong> (CTC): a way to commit to a value at a verifiable time without leaving any sign that a commitment was made. Our construction hides a commitment as the ECDSA signature nonce of an otherwise ordinary blockchain transaction &mdash; the resulting transaction is computationally indistinguishable from background traffic. To open the commitment, the user reveals the value and randomness used to generate it, and a verifier recomputes the commitment and verifies that it was used as the nonce for the on-chain signature. Because revealing the nonce leaks the private key, the transaction should transfer the account's entire balance, which restricts the anonymity set.
+      </p>
+
+      <div class="ctc-demo" aria-label="Covert Timestamped Commitment demonstration">
+        <div class="ctc-commit-panel">
+          <label class="ctc-input-label" for="ctc-input">Enter a value to commit to:</label>
+          <div class="ctc-input-row">
+            <input type="text" id="ctc-input" class="ctc-input" placeholder="e.g. my secret credential" maxlength="64" />
+            <button id="ctc-commit-btn" class="ctc-btn">Commit</button>
+          </div>
+        </div>
+
+        <div class="ctc-stage">
+          <div class="ctc-feed-label">
+            <span class="ctc-chain-name">Blockchain transactions</span>
+            <span class="ctc-chain-sub">balance-emptying transfers</span>
+          </div>
+          <div class="ctc-feed" id="ctc-feed" role="list"></div>
+        </div>
+
+        <div class="ctc-open-panel" id="ctc-open-panel">
+          <p class="ctc-open-prompt">One of these transactions contains your commitment. Can you tell which one?</p>
+          <button id="ctc-open-btn" class="ctc-btn ctc-btn-reveal">Open commitment</button>
+        </div>
+
+        <div class="ctc-verify" id="ctc-verify"></div>
+      </div>
+
     </section>
 
     <section class="section" id="coco">
       <h2>Cost of Coercion (CoCo)</h2>
       <p>
-        Different CR schemes have historically used incompatible security definitions, making cross-protocol comparison difficult. We introduce <strong>CoCo</strong>: a protocol-agnostic, game-theoretic metric. CoCo measures the <em>economic cost</em> to an adversary of swaying an election with target probability <code>p</code>, normalized by the same cost under a non-coercion-resistant baseline.
+        To enable comparison across different CR definitions and design approaches, we introduce <strong>CoCo</strong> (Cost of Coercion), a protocol-agnostic metric that quantifies CR game-theoretically. It measures the <em>economic cost</em> to an adversary of achieving a desired voting outcome with a target probability <code>p</code>, normalized by the same cost for a non-CR scheme. Higher CoCo means stronger practical CR.
       </p>
       <p>
-        <strong>CoCo of <code>k</code> means an adversary must spend <code>k</code>&times; as much to sway a Cast Iron election as they would to sway an equivalent unprotected one.</strong> Higher is better.
+        CoCo is built on a coercion game that models how rational voters respond to bribes. Each voter chooses to <strong>ignore</strong> the bribe, <strong>cooperate</strong> with the adversary, or <strong>defect</strong> (accept the bribe but attempt to evade). The voter's choice depends on the bribe amount, their pivotality, and the protocol's evasion success and detection probabilities.
+      </p>
+
+      <div class="voter-sim-wrap">
+        <h3 class="voter-sim-title">Single-voter coercion game</h3>
+        <p class="voter-sim-desc">
+          Explore how a rational voter responds to bribes under different protocol parameters. The voter has unit utility for their preferred outcome and chooses whichever action maximizes their expected utility.
+        </p>
+        <div class="voter-sim-layout">
+          <div class="voter-sim-controls" id="voter-sim-controls"></div>
+          <div class="voter-sim-chart" id="voter-sim-chart"></div>
+        </div>
+      </div>
+
+      <p>
+        By simulating this game across an electorate of many voters, we can compute the total cost an adversary must pay to achieve a target win probability <code>p</code>. Normalizing by the cost without any CR gives the <strong>CoCo</strong> curve for each protocol:
       </p>
 
       <div class="coco-plot-wrap">
+        <p class="coco-caption">Simulation: 100 equal-weight voters &nbsp;&middot;&nbsp; 25% initially prefer <em>yes</em>, 75% prefer <em>no</em></p>
         <div class="coco-plot" data-plot="coco" aria-label="Cost of Coercion across protocols"></div>
-        <div class="coco-legend"></div>
+        <div class="coco-description">Click a curve or label to see its parameters.</div>
       </div>
 
-      <p class="caption">
-        In the fully online setting, deniable revoting collapses to <code>CoCo&nbsp;&approx;&nbsp;1</code> &mdash; no harder to attack than no CR at all &mdash; because rational voters who expect to defect successfully half the time accept correspondingly smaller bribes. Cast Iron achieves a flat <strong>25&times;</strong> advantage across all target win probabilities.
+      <p>
+        The most striking result is that deniable revoting with a coin-flip race collapses to <code>CoCo &approx; 1</code>: a voter who expects to defect successfully half the time accepts a bribe half as large, so the adversary's per-voter cost is nearly unchanged from the non-CR baseline. Cast Iron achieves a flat <strong>25&times;</strong> across all <code>p</code>, the adversary's cost depends only on the detection gap. Practical CR cannot be summarized by a single number &mdash; the adversary's cost varies across regimes, and CoCo makes these tradeoffs visible.
       </p>
-    </section>
-
-    <section class="section" id="results">
-      <h2>What Cast Iron buys you</h2>
-      <div class="results-grid">
-        <div class="result-card">
-          <div class="result-headline">25&times;</div>
-          <div class="result-label">Cost-of-coercion advantage</div>
-          <div class="result-detail">Over comparable schemes in the fully online threat model, with a 1-minute registration window on Tron.</div>
-        </div>
-        <div class="result-card">
-          <div class="result-headline">~$100</div>
-          <div class="result-label">to verifiably tally 1M ballots</div>
-          <div class="result-detail">~1,350 parallelizable core-hours on commodity cloud instances. Quasi-linear in the number of ballots.</div>
-        </div>
-        <div class="result-card">
-          <div class="result-headline">&lt;&nbsp;$1</div>
-          <div class="result-label">per registration</div>
-          <div class="result-detail">Two ordinary Ethereum transactions at current gas prices. No registrar, no special hardware.</div>
-        </div>
-        <div class="result-card">
-          <div class="result-headline">0</div>
-          <div class="result-label">trusted parties for integrity</div>
-          <div class="result-detail">A single tallier is trusted for privacy, but anyone can verify the tally with a public zk-SNARK proof.</div>
-        </div>
-      </div>
     </section>
 
     <section class="section" id="bibtex">
@@ -248,5 +215,6 @@
 }</code></pre>
     </section>
 
+  </main>
 </body>
 </html>
