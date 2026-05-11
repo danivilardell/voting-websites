@@ -21,13 +21,13 @@
       label: 'The offer',
       public: { adv: '<b>Alice</b>, vote <b>In favour</b> and I will pay you <b>100</b>. I will read your ballot straight from the public tally.' },
       noised: { adv: '<b>Alice</b>, vote <b>In favour</b> and I will pay you <b>100</b> if the noisy totals suggest you complied.' },
-      private: { adv: '<b>Alice</b>, vote <b>In favour</b> and I will pay you <b>100</b> if In favour wins.' }
+      private: { adv: '<b>Alice</b>, vote <b>In favour</b> and I will pay you <b>100</b> if <em>In favour</em> wins.' }
     },
     vote: {
       label: 'Alice decides (w = 3)',
-      public: { voter: 'They will see my ballot. If I vote In favour, I will be paid. If I vote Against, I won\'t.' },
-      noised: { voter: 'The noise hides me. I vote Against. The adversary may still pay me.' },
-      private: { voter: 'They only see the winner, not my ballot. I pocket the bribe if In favour wins <em>and</em> still vote Against.' }
+      public: { voter: 'They will see my ballot. If I vote <em>In favour</em>, I will be paid. If I vote <em>Against</em>, I won\'t.' },
+      noised: { voter: 'The noise hides me. I vote <em>Against</em>. The adversary may still pay me.' },
+      private: { voter: 'They only see the winner, not my ballot. I pocket the bribe if <em>In favour</em> wins <em>and</em> still vote <em>Against</em>.' }
     },
     reveal: {
       label: 'What the tally reveals',
@@ -37,15 +37,15 @@
     },
     verify: {
       label: 'The adversary checks',
-      public: { advVerify: 'Alice voted In favour. <b>I pay 100</b>.' },
+      public: { advVerify: 'Alice voted <em>In favour</em>. <b>I pay 100</b>.' },
       noised: { advVerify: 'Noisy totals are consistent with Alice complying (p&nbsp;&asymp;&nbsp;0.5). <b>I pay 100</b>.' },
-      private: { advVerify: 'In favour wins. <b>I pay 100</b>.' }
+      private: { advVerify: '<em>In favour</em> wins. <b>I pay 100</b>.' }
     },
     verdict: {
       label: 'Bribery outcome',
-      public: { verdict: { tag: 'Low B \u2248 100', text: 'Per-ballot contracts are enforceable. Cost to buy a pivotal vote &asymp; <b>100</b>. B&#8209;privacy is <b>small</b>.' } },
-      noised: { verdict: { tag: 'Medium B \u2248 400', text: 'Probabilistic contract. Adversary pays even on defection &rarr; must over-budget &times;4 to absorb noise. Cost &asymp; <b>400</b>. B&#8209;privacy is <b>larger</b>.' } },
-      private: { verdict: { tag: 'High B \u226B 400', text: 'No per-ballot contract exists. Bribery must target the outcome directly, cost <b>&gg;&nbsp;400</b>. B&#8209;privacy is <b>largest</b>.' } }
+      public: { verdict: { tag: 'Low B-Privacy', text: 'The adversary can observe Alice\'s vote and enforce a per-ballot contract. The voters are heavily incentivised to comply.' } },
+      noised: { verdict: { tag: 'Medium B-Privacy', text: 'Alice was able to vote Against and receive the bribe. The probabilistic contract increases the general cost to overturn an election.' } },
+      private: { verdict: { tag: 'High B-Privacy', text: 'Alice once again was able to vote privately her preference and receive the bribe. This greatly increases the cost of compliance and therefore the cost of bribery.' } }
     }
   };
 
@@ -204,6 +204,30 @@
     running = false;
     clearTimers();
   }
+
+  // Add click handlers to dots
+  phaseEl.dots.forEach((dot, idx) => {
+    dot.style.cursor = 'pointer';
+    dot.addEventListener('click', () => {
+      clearTimers();
+      running = false;
+      cancelled = false;
+      clearAll();
+      // Show all phases up to and including the clicked one
+      for (let i = 0; i <= idx; i++) {
+        setPhase(i);
+      }
+      // Resume animation from the clicked phase after a delay
+      const phase = PHASES[idx];
+      const hold = HOLD[phase] || 6000;
+      schedule(() => {
+        if (idx + 1 < PHASES.length) {
+          running = true;
+          runPhase(idx + 1);
+        }
+      }, hold);
+    });
+  });
 
   if (prefersReduced) {
     showFinal();

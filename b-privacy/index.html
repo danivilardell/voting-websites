@@ -14,6 +14,7 @@
   <script src="plot_data.js" defer></script>
   <script src="plots.js" defer></script>
   <script src="bprivacy_game.js" defer></script>
+  <script src="dao_plot.js" defer></script>
 </head>
 <body>
   <main class="page">
@@ -189,11 +190,10 @@
     <section class="section" id="noise-defense">
       <h2>Noise as a defense</h2>
       <p>
-        A straightforward solution to those attacks is to publish a <em>noised</em> tally instead of the
-        raw count: a small amount of calibrated randomness is added to
-        each option&rsquo;s total. While if done correctly the outcome stays the same,
-        the noise shifts the result so the attacker can no longer
-        be sure which weight went where with 100% confidence.
+          A straightforward fix is to publish only the <em>winner</em> of the election rather than the full tally. This eliminates the leakage but however would sacrifice transparency, omitting critical statistics—such as the margin of victory and the rate of voter participation—that are non-negotiable for achieving trust in governance.
+      </p>
+      <p>
+          A better approach is to publish a <em>noised</em> tally: a small amount of calibrated randomness is added to each option's total. Done correctly, the reported winner stays the same, but the noise blurs the exact counts enough that an attacker can no longer pin down with certainty which voter's weight went where.
       </p>
       <p>
         We ran the same deanonymization attack on noised tallies, and found that noise 
@@ -221,7 +221,10 @@
     <section class="section" id="bprivacy-game">
       <h2>Privacy as bribery cost</h2>
       <p>
-        The whale and precision attacks show that tallies can leak, but they are only heuristics. They don't tell us what the <em>strongest</em> adversary can do against a given disclosure rule. For that, we need a well-defined privacy notion. Existing definitions in the token-weighted setting diverge sharply depending on whether they focus on leaked weights or leaked ballots, so we propose a definition that instead captures leakage through its <em>impact on the election</em>: the more a tally reveals, the cheaper it becomes for an adversary to bribe voters into flipping the outcome.
+        The whale and precision attacks show that tallies can leak, but they are only heuristics. They don't tell us what the <em>strongest</em> adversary can do against a given tally. For that, we need a well-defined privacy notion. 
+      </p>
+      <p>
+        Existing definitions in the token-weighted setting diverge sharply depending on whether they focus on leaked weights or leaked ballots, which we have seen can be completely uncorrelated. We instead propose a privacy definition that instead captures leakage through its <em>impact on the election integrity</em>: the more a tally reveals, the easier it is for an adversary to bribe voters into flipping the outcome.
       </p>
       <p>
         <strong>B&#8209;privacy</strong> is the minimum total bribe an adversary must commit to flip an outcome with high confidence, given only what the published tally reveals. Bribes are enforceable only when the adversary can verify compliance from the tally, so the disclosure rule directly sets the price of influence.
@@ -288,7 +291,7 @@
           <article class="bribe-cell" data-mode="private">
             <header>
               <h3>Winner&#8209;only</h3>
-              <p class="bribe-sub">Only the winning option is announced.</p>
+              <p class="bribe-sub">Only the winning option is revealed.</p>
             </header>
             <div class="actors">
               <div class="actor actor-adv">
@@ -310,11 +313,21 @@
       </div>
 
       <p class="caption">
-        Same bribe, three tallies. The disclosure rule chooses the
-        contract the adversary can enforce &mdash; and therefore the price
-        of corruption. Even though the bribe was the same, Alice only chose to comply
-        when the bribe was enforceable under the public tally. 
+        This example showcases the tradeoff between transparency and privacy in token weighted elections. The less information reported as an election result, the higher B-Privacy. However, less information also means less transparency, which can undermine trust in the election process.
       </p>
+    </section>
+
+    <section class="section" id="dao-comparison">
+      <h2>B&#8209;Privacy Across DAOs</h2>
+      <p>
+        We analyze bribery costs across DAOs to understand how B-privacy varies in real governance systems. The chart below shows the average cost multiplier (B-privacy factor) for a representative sample of DAOs when using noised voting compared to public tallies.
+      </p>
+      <div class="dao-plot-wrap">
+        <div class="dao-plot" id="dao-chart"></div>
+        <p class="caption">
+          B-privacy factor for 10 representative DAOs, ranging from those with minimal privacy benefits (balancer, curve) to extreme cases (aavegotchi, shellprotocol). Red dots show Winner-Only voting; green dots show Tally Perturbation 10% noising. The baseline (dashed line) represents full-disclosure voting with no privacy.
+        </p>
+      </div>
     </section>
 
 

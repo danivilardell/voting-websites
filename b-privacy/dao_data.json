@@ -1,0 +1,200 @@
+[
+  {
+    "name": "yieldguild.eth",
+    "private_bprivacy": 1.0,
+    "noised_bprivacy": 1.0,
+    "proposals": 1
+  },
+  {
+    "name": "balancer.eth",
+    "private_bprivacy": 1.016,
+    "noised_bprivacy": 1.001,
+    "proposals": 299
+  },
+  {
+    "name": "dexe.network",
+    "private_bprivacy": 1.045,
+    "noised_bprivacy": 1.012,
+    "proposals": 7
+  },
+  {
+    "name": "curve.eth",
+    "private_bprivacy": 1.114,
+    "noised_bprivacy": 1.014,
+    "proposals": 118
+  },
+  {
+    "name": "comp-vote.eth",
+    "private_bprivacy": 1.643,
+    "noised_bprivacy": 1.037,
+    "proposals": 5
+  },
+  {
+    "name": "cakevote.eth",
+    "private_bprivacy": 1.548,
+    "noised_bprivacy": 1.064,
+    "proposals": 266
+  },
+  {
+    "name": "speraxdao.eth",
+    "private_bprivacy": 1.667,
+    "noised_bprivacy": 1.069,
+    "proposals": 68
+  },
+  {
+    "name": "gnosis.eth",
+    "private_bprivacy": 1.641,
+    "noised_bprivacy": 1.07,
+    "proposals": 172
+  },
+  {
+    "name": "sushigov.eth",
+    "private_bprivacy": 1.77,
+    "noised_bprivacy": 1.083,
+    "proposals": 161
+  },
+  {
+    "name": "dydxgov.eth",
+    "private_bprivacy": 2.247,
+    "noised_bprivacy": 1.091,
+    "proposals": 44
+  },
+  {
+    "name": "bitdao.eth",
+    "private_bprivacy": 2.983,
+    "noised_bprivacy": 1.104,
+    "proposals": 32
+  },
+  {
+    "name": "snapshot.dcl.eth",
+    "private_bprivacy": 3.055,
+    "noised_bprivacy": 1.132,
+    "proposals": 211
+  },
+  {
+    "name": "lido-snapshot.eth",
+    "private_bprivacy": 2.516,
+    "noised_bprivacy": 1.135,
+    "proposals": 296
+  },
+  {
+    "name": "uma.eth",
+    "private_bprivacy": 2.786,
+    "noised_bprivacy": 1.144,
+    "proposals": 15
+  },
+  {
+    "name": "beanstalkfarms.eth",
+    "private_bprivacy": 2.326,
+    "noised_bprivacy": 1.177,
+    "proposals": 141
+  },
+  {
+    "name": "uniswapgovernance.eth",
+    "private_bprivacy": 2.945,
+    "noised_bprivacy": 1.23,
+    "proposals": 122
+  },
+  {
+    "name": "graphprotocol.eth",
+    "private_bprivacy": 3.333,
+    "noised_bprivacy": 1.23,
+    "proposals": 2
+  },
+  {
+    "name": "quickvote.eth",
+    "private_bprivacy": 3.022,
+    "noised_bprivacy": 1.261,
+    "proposals": 43
+  },
+  {
+    "name": "safe.eth",
+    "private_bprivacy": 3.283,
+    "noised_bprivacy": 1.275,
+    "proposals": 50
+  },
+  {
+    "name": "metislayer2.eth",
+    "private_bprivacy": 2.816,
+    "noised_bprivacy": 1.282,
+    "proposals": 224
+  },
+  {
+    "name": "ens.eth",
+    "private_bprivacy": 4.48,
+    "noised_bprivacy": 1.34,
+    "proposals": 43
+  },
+  {
+    "name": "arbitrumfoundation.eth",
+    "private_bprivacy": 5.229,
+    "noised_bprivacy": 1.476,
+    "proposals": 279
+  },
+  {
+    "name": "opcollective.eth",
+    "private_bprivacy": 4.945,
+    "noised_bprivacy": 1.543,
+    "proposals": 87
+  },
+  {
+    "name": "radiantcapital.eth",
+    "private_bprivacy": 4.619,
+    "noised_bprivacy": 1.559,
+    "proposals": 41
+  },
+  {
+    "name": "gmx.eth",
+    "private_bprivacy": 4.722,
+    "noised_bprivacy": 1.589,
+    "proposals": 19
+  },
+  {
+    "name": "apecoin.eth",
+    "private_bprivacy": 4.396,
+    "noised_bprivacy": 1.679,
+    "proposals": 269
+  },
+  {
+    "name": "gitcoindao.eth",
+    "private_bprivacy": 4.028,
+    "noised_bprivacy": 1.999,
+    "proposals": 133
+  },
+  {
+    "name": "g-dao.eth",
+    "private_bprivacy": 4.783,
+    "noised_bprivacy": 2.107,
+    "proposals": 33
+  },
+  {
+    "name": "polygonvalidators.eth",
+    "private_bprivacy": 28.811,
+    "noised_bprivacy": 7.527,
+    "proposals": 1
+  },
+  {
+    "name": "beanstalkdao.eth",
+    "private_bprivacy": 29.558,
+    "noised_bprivacy": 9.283,
+    "proposals": 33
+  },
+  {
+    "name": "poh.eth",
+    "private_bprivacy": 26.452,
+    "noised_bprivacy": 14.134,
+    "proposals": 108
+  },
+  {
+    "name": "shellprotocol.eth",
+    "private_bprivacy": 25.334,
+    "noised_bprivacy": 17.677,
+    "proposals": 13
+  },
+  {
+    "name": "aavegotchi.eth",
+    "private_bprivacy": 24.093,
+    "noised_bprivacy": 18.246,
+    "proposals": 250
+  }
+]

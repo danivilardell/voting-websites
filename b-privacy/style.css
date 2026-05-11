@@ -309,6 +309,63 @@ a:hover {
 }
 .bibtex code { font-family: inherit; }
 
+/* ---------- DAO Comparison Plot ---------- */
+
+.dao-plot-wrap {
+  margin-top: 14px;
+  margin-bottom: 0;
+}
+
+.dao-plot {
+  width: 100%;
+}
+
+.dao-plot svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dao-plot-wrap .caption {
+  margin-top: -24px;
+  margin-bottom: 0;
+}
+
+.dao-axis-line { stroke: #cfc8b3; stroke-width: 1; }
+.dao-grid { stroke: #ece6d3; stroke-width: 1; stroke-dasharray: 2 3; }
+.dao-tick {
+  font-family: var(--sans);
+  font-size: 11px;
+  fill: #6b6757;
+}
+.dao-axis-title {
+  font-family: var(--sans);
+  font-size: 12px;
+  fill: var(--ink);
+  font-weight: 500;
+}
+.dao-bar {
+  fill: var(--accent);
+  transition: fill 200ms ease, opacity 200ms ease;
+}
+.dao-bar:hover {
+  fill: var(--accent-soft);
+  opacity: 0.9;
+}
+.dao-label {
+  font-family: var(--sans);
+  font-size: 10px;
+  fill: var(--ink-soft);
+  text-anchor: end;
+}
+.dao-value {
+  font-family: var(--sans);
+  font-size: 10px;
+  fill: var(--accent);
+  font-weight: 600;
+  text-anchor: middle;
+}
+
 /* ---------- Deanonymize Demo ---------- */
 
 #deanonymize .deanon {
@@ -760,7 +817,9 @@ a:hover {
   border-radius: 50%;
   background: #d9cfb3;
   transition: background 250ms ease, transform 250ms ease;
+  cursor: pointer;
 }
+.bribe-phase-dots .dot:hover { background: #c9a24a; transform: scale(1.2); }
 .bribe-phase-dots .dot.done { background: var(--accent-soft); }
 .bribe-phase-dots .dot.current { background: var(--accent); transform: scale(1.35); }
 
