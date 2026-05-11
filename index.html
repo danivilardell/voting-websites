@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Governance Research</title>
+  <meta name="description" content="Governance Research: Privacy-preserving voting systems and coercion-resistant mechanisms for modern governance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --surface: #ffffff;
+      --ink: #1a1a1a;
+      --ink-soft: #444;
+      --muted: #777;
+      --rule: #e6e2d6;
+      --accent: #8a6d1f;
+      --accent-soft: #c9a24a;
+      --iron: #2c3e50;
+      --iron-soft: #5a7593;
+      --rust: #9b3a1c;
+      --serif: 'Cormorant Garamond', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      --max: 920px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--rule);
+      transition: border-color 120ms ease, color 120ms ease;
+    }
+    a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+
+    .page {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 72px 28px 32px;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      text-align: center;
+      padding-bottom: 48px;
+      margin-bottom: 56px;
+    }
+
+    .hero-title {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: clamp(32px, 5vw, 48px);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin: 0 0 16px;
+      color: var(--ink);
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--ink-soft);
+      margin: 0;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    /* ---------- Intro Section ---------- */
+    .intro {
+      max-width: 100%;
+      margin: 0 0 56px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      text-align: center;
+    }
+
+    .intro p {
+      color: var(--ink-soft);
+      font-size: 16.5px;
+      margin: 0 0 12px;
+      line-height: 1.7;
+      max-width: 740px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .intro p:last-child { margin-bottom: 0; }
+    .intro strong { color: var(--ink); font-weight: 600; }
+
+    /* ---------- Papers Grid ---------- */
+    .papers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .paper-card {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+    .paper-card:hover {
+      border-color: var(--accent-soft);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .paper-card.b-privacy { border-top: 3px solid var(--accent); }
+    .paper-card.cast-iron { border-top: 3px solid var(--iron); }
+    .paper-card.vbe { border-top: 3px solid var(--rust); }
+
+    .paper-logo {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .paper-title {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 20px;
+      margin: 0 0 12px;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+
+    .paper-subtitle {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 0 0 16px;
+      font-weight: 500;
+    }
+
+    .paper-description {
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      line-height: 1.6;
+      margin: 0 0 20px;
+      flex-grow: 1;
+    }
+
+    .paper-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 0;
+      flex-grow: 1;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px) {
+      .papers-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .page { padding: 48px 20px 72px; }
+      .hero { margin-bottom: 40px; }
+      .papers-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .hero-title { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+
+    <header class="hero">
+      <h1 class="hero-title">Governance Research</h1>
+      <p class="hero-subtitle">Privacy-preserving voting systems and coercion-resistant mechanisms</p>
+    </header>
+
+    <section class="intro">
+      <p>
+        Modern governance systems—from decentralized autonomous organizations (DAOs) to large-scale elections—face fundamental tensions between <strong>transparency</strong>, <strong>privacy</strong>, and <strong>coercion-resistance</strong>. These research projects explore how to design voting systems that simultaneously protect voter privacy, resist bribery and coercion, and maintain public auditability.
+      </p>
+      <p>
+        Below are three complementary approaches to governance security, each addressing different aspects of the voting system challenge.
+      </p>
+    </section>
+
+    <section class="papers-grid">
+
+      <article class="paper-card vbe" style="cursor: not-allowed; opacity: 0.7;">
+        <h2 class="paper-title" style="color: var(--rust);">VBE</h2>
+        <p class="paper-subtitle">Voting Block Entropy</p>
+        <p class="paper-description">
+          Coming soon.
+        </p>
+        <p class="paper-meta">In preparation • 2023</p>
+      </article>
+
+      <a href="b-privacy/index.html" class="paper-card b-privacy">
+        <img src="b-privacy/logo.svg" alt="B-Privacy logo" class="paper-logo" />
+        <h2 class="paper-title">B-Privacy</h2>
+        <p class="paper-subtitle">Weighted Voting Privacy</p>
+        <p class="paper-description">
+          A privacy framework for weighted voting systems that measures the economic cost of bribery under revealed tallies. Proposes mechanisms to boost privacy by noising tallies while maintaining transparency and auditability.
+        </p>
+        <p class="paper-meta">Breckenridge, Vilardell, Fábrega, et al. • USENIX 2026</p>
+      </a>
+
+      <a href="cast-iron/index.html" class="paper-card cast-iron">
+        <img src="cast-iron/logo.svg" alt="Cast Iron logo" class="paper-logo" />
+        <h2 class="paper-title">Cast Iron</h2>
+        <p class="paper-subtitle">Coercion-Resistant Voting</p>
+        <p class="paper-description">
+          A publicly verifiable, fake-credential voting system that achieves coercion-resistance without untappable channels. Enables voters to self-register privately by hiding credentials in blockchain transactions, with no fixed registration window.
+        </p>
+        <p class="paper-meta">Vilardell, Breckenridge, Fábrega, et al. • Under submission, 2026</p>
+      </a>
+
+      
+
+    </section>
+
+</body>
+</html>

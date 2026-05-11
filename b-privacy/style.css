@@ -45,7 +45,7 @@ a:hover {
 .page {
   max-width: var(--max);
   margin: 0 auto;
-  padding: 72px 28px 96px;
+  padding: 72px 28px 32px;
 }
 
 /* ---------- Hero ---------- */
@@ -308,18 +308,6 @@ a:hover {
   color: var(--ink);
 }
 .bibtex code { font-family: inherit; }
-
-/* ---------- Footer ---------- */
-
-.footer {
-  text-align: center;
-  padding-top: 40px;
-  margin-top: 64px;
-  border-top: 1px solid var(--rule);
-  color: var(--muted);
-  font-size: 13px;
-}
-.footer p { margin: 0; }
 
 /* ---------- Deanonymize Demo ---------- */
 
@@ -1040,7 +1028,7 @@ a:hover {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 560px) {
-  .page { padding: 48px 20px 72px; }
+  .page { padding: 48px 20px 32px; }
   .hero { padding-bottom: 36px; margin-bottom: 40px; }
   .section { margin: 44px 0; }
   .btn { padding: 8px 14px; font-size: 13.5px; }
