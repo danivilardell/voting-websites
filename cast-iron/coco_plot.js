@@ -1,257 +1,272 @@
 (function () {
-  const root = document.querySelector('#coco .coco-plot');
+  var root = document.querySelector('#coco .coco-plot');
   if (!root) return;
 
-  const legend = document.querySelector('#coco .coco-legend');
-  const SVG = 'http://www.w3.org/2000/svg';
+  var descBox = document.querySelector('#coco .coco-description');
+  var SVG = 'http://www.w3.org/2000/svg';
 
-  const prefersReduced = window.matchMedia &&
+  var prefersReduced = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ---------- Plot geometry ----------
-  const W = 820, H = 420;
-  const M = { l: 64, r: 160, t: 24, b: 48 };
-  const PLOT_W = W - M.l - M.r;
-  const PLOT_H = H - M.t - M.b;
+  var W = 860, H = 440;
+  var M = { l: 72, r: 200, t: 24, b: 60 };
+  var PLOT_W = W - M.l - M.r;
+  var PLOT_H = H - M.t - M.b;
 
-  const xMin = 0, xMax = 1;
-  const yMin = 1, yMax = 40;
+  var xMin = 0, xMax = 1;
+  var yMin = 1, yMax = 35;
 
-  const xScale = p => M.l + (p - xMin) / (xMax - xMin) * PLOT_W;
-  const yScale = c => M.t + PLOT_H - (c - yMin) / (yMax - yMin) * PLOT_H;
+  function xScale(p) { return M.l + (p - xMin) / (xMax - xMin) * PLOT_W; }
+  function yScale(c) { return M.t + PLOT_H - (c - yMin) / (yMax - yMin) * PLOT_H; }
 
-  // ---------- Curve models (match paper Figure 9 qualitatively) ----------
-  // Cast Iron: perfect evasion (γ=1) ⇒ flat at 1/(α-β) ≈ 25 across all p.
-  function castIron(p) { return 25; }
-
-  // Loki: hybrid signaling. ~Linear rise from ~1 to ~12.
-  function loki(p) { return 1 + 11 * p; }
-
-  // Revoting with voter latency advantage (γ ≈ 0.7).
-  // Stays near 1 until p ≈ 0.75, then climbs sharply, peaking near 30 at p = 1.
-  function revoteAdv(p) {
-    const base = 1;
-    const sig  = 32 / (1 + Math.exp(-22 * (p - 0.86)));
-    return base + sig;
-  }
-
-  // Plain revoting (coin-flip race, γ = 0.5). Effectively flat at ~1.
-  function revote(p) { return 1.05; }
-
-  const SAMPLES = 220;
-  function pathFor(fn) {
-    let d = '';
-    for (let i = 0; i <= SAMPLES; i++) {
-      const p = i / SAMPLES;
-      const x = xScale(p);
-      const y = yScale(Math.max(yMin, Math.min(yMax, fn(p))));
-      d += (i === 0 ? 'M' : 'L') + x.toFixed(2) + ' ' + y.toFixed(2) + ' ';
-    }
-    return d.trim();
-  }
-
-  // ---------- Build SVG ----------
   function el(tag, attrs, parent) {
-    const node = document.createElementNS(SVG, tag);
-    if (attrs) Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+    var node = document.createElementNS(SVG, tag);
+    if (attrs) Object.entries(attrs).forEach(function (kv) { node.setAttribute(kv[0], kv[1]); });
     if (parent) parent.appendChild(node);
     return node;
   }
 
-  const svg = el('svg', {
-    viewBox: `0 0 ${W} ${H}`,
-    preserveAspectRatio: 'xMidYMid meet',
-    role: 'img'
-  });
-  root.appendChild(svg);
+  var COLORS = {
+    cast_iron: '#8a6d1f',
+    loki: '#b87333',
+    revoting: '#6b8a3a',
+    revoting_adv: '#2f5b73'
+  };
 
-  // Grid: y at 1, 5, 10, 15, 20, 25, 30, 35, 40
-  const yTicks = [1, 5, 10, 15, 20, 25, 30, 35, 40];
-  yTicks.forEach(t => {
-    el('line', {
-      class: 'coco-grid',
-      x1: M.l, y1: yScale(t), x2: M.l + PLOT_W, y2: yScale(t)
-    }, svg);
-    const lbl = el('text', {
-      class: 'coco-tick',
-      x: M.l - 8, y: yScale(t) + 4,
-      'text-anchor': 'end'
-    }, svg);
-    lbl.textContent = (t === 1 ? '1×' : t + '×');
-  });
-
-  // X ticks
-  const xTicks = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
-  xTicks.forEach(t => {
-    el('line', {
-      class: 'coco-grid',
-      x1: xScale(t), y1: M.t, x2: xScale(t), y2: M.t + PLOT_H
-    }, svg);
-    const lbl = el('text', {
-      class: 'coco-tick',
-      x: xScale(t), y: M.t + PLOT_H + 18,
-      'text-anchor': 'middle'
-    }, svg);
-    lbl.textContent = t.toFixed(1);
-  });
-
-  // Axes
-  el('line', { class: 'coco-axis-line', x1: M.l, y1: M.t, x2: M.l, y2: M.t + PLOT_H }, svg);
-  el('line', { class: 'coco-axis-line', x1: M.l, y1: M.t + PLOT_H, x2: M.l + PLOT_W, y2: M.t + PLOT_H }, svg);
-
-  // Axis titles
-  const xt = el('text', {
-    class: 'coco-axis-title',
-    x: M.l + PLOT_W / 2,
-    y: H - 12,
-    'text-anchor': 'middle'
-  }, svg);
-  xt.textContent = 'Target win probability  p';
-
-  const yt = el('text', {
-    class: 'coco-axis-title',
-    x: 16, y: M.t + PLOT_H / 2,
-    'text-anchor': 'middle',
-    transform: `rotate(-90 16 ${M.t + PLOT_H / 2})`
-  }, svg);
-  yt.textContent = 'CoCo(p)  —  cost factor vs. no CR';
-
-  // ---------- Curves ----------
-  const curves = [
+  var CURVES = [
     {
-      name: 'Cast Iron',
-      meta: 'success 100%, detection 4%',
-      fn: castIron,
-      cls: 'coco-curve-cast',
-      labelCls: 'coco-label-cast',
-      labelAt: 25,
-      labelText: 'Cast Iron'
+      key: 'cast_iron_ratio', name: 'Cast Iron', color: COLORS.cast_iron, width: 3.5,
+      desc: '<strong>Evasion success: 100%. Detection gap: 4%.</strong><br>Voters register before coercion begins, so evasion always succeeds. Detection is limited to empirical CTC leakage from the ECDSA-nonce construction.'
     },
     {
-      name: 'Loki',
-      meta: 'success 80%, detection 4%',
-      fn: loki,
-      cls: 'coco-curve-loki',
-      labelCls: 'coco-label-loki',
-      labelAt: 12,
-      labelText: 'Loki'
+      key: 'loki_ratio', name: 'Loki', color: COLORS.loki, width: 2.8,
+      desc: '<strong>Evasion success: 80%. Detection gap: 4%.</strong><br>(<a href="https://eprint.iacr.org/2023/1876.pdf" target="_blank" rel="noopener">Loki paper</a>) Vulnerable to brute-force attacks on ballot indices under realistic revoting patterns (<a href="https://arxiv.org/pdf/2604.00188" target="_blank" rel="noopener">Qiao et al.</a>). The adversary observes per-voter noise and real ballot counts, giving a detection gap on par with Cast Iron.'
     },
     {
-      name: 'Revoting (voter adv.)',
-      meta: 'success 70%, detection 1%',
-      fn: revoteAdv,
-      cls: 'coco-curve-revote-adv',
-      labelCls: 'coco-label-revote-adv',
-      labelAt: 32,
-      labelText: 'Revoting (voter adv.)'
+      key: 'revoting_adv_ratio', name: 'Revoting (voter adv.)', color: COLORS.revoting_adv, width: 2.8,
+      desc: '<strong>Evasion success: 70%. Detection gap: 1%.</strong><br>The voter has a network-latency advantage in the last-ballot race. Only aggregate ballot volume is leaked, so the detection gap is low.'
     },
     {
-      name: 'Revoting',
-      meta: 'success 50%, detection 1%',
-      fn: revote,
-      cls: 'coco-curve-revote',
-      labelCls: 'coco-label-revote',
-      labelAt: 1.0,
-      labelText: 'Revoting'
+      key: 'revoting_ratio', name: 'Revoting', color: COLORS.revoting, width: 2.8,
+      desc: '<strong>Evasion success: 50%. Detection gap: 1%.</strong><br>The last-ballot race is modeled as a coin flip with no voter advantage. Only aggregate ballot volume is leaked.'
     }
   ];
 
-  // Compute path lengths so we can drive stroke-dashoffset properly per curve.
-  const paths = [];
-  curves.forEach((c, i) => {
-    const path = el('path', {
-      class: `coco-curve ${c.cls}`,
-      d: pathFor(c.fn)
-    }, svg);
-    paths.push({ ...c, path });
-  });
+  var activeKey = null;
 
-  // After insertion, set stroke-dasharray to the actual length of each path.
-  paths.forEach(p => {
-    let len = 0;
-    try { len = p.path.getTotalLength(); } catch (e) { len = 1000; }
-    p.length = len || 1000;
-    p.path.style.strokeDasharray  = `${p.length}`;
-    p.path.style.strokeDashoffset = `${p.length}`;
-  });
+  function showDescription(html, key) {
+    if (!descBox) return;
+    activeKey = key;
+    descBox.innerHTML = html;
+    descBox.classList.add('visible');
+  }
 
-  // Curve labels (right edge)
-  paths.forEach(p => {
-    const lblY = yScale(p.labelAt);
-    const labelX = M.l + PLOT_W + 8;
-    const t = el('text', {
-      class: `coco-label ${p.labelCls}`,
-      x: labelX,
-      y: lblY + 4
-    }, svg);
-    t.textContent = p.labelText;
-    p.label = t;
-  });
+  function hideDescription(key) {
+    if (!descBox) return;
+    if (activeKey !== key) return;
+    activeKey = null;
+    descBox.innerHTML = 'Click a curve or label to see its parameters.';
+    descBox.classList.remove('visible');
+  }
 
-  // ---------- Legend ----------
-  if (legend) {
-    legend.innerHTML = '';
-    curves.forEach(c => {
-      const li = document.createElement('span');
-      li.className = 'lg-item';
-      const sw = document.createElement('span');
-      sw.className = 'lg-swatch';
-      sw.style.background = swatchColor(c.cls);
-      const text = document.createElement('span');
-      text.innerHTML = `<strong style="color: var(--ink);">${c.name}</strong> <span class="lg-meta">— ${c.meta}</span>`;
-      li.appendChild(sw);
-      li.appendChild(text);
-      legend.appendChild(li);
+  function parseCSV(text) {
+    var lines = text.trim().split('\n');
+    var headers = lines[0].split(',');
+    var rows = [];
+    for (var i = 1; i < lines.length; i++) {
+      var vals = lines[i].split(',');
+      var row = {};
+      for (var j = 0; j < headers.length; j++) {
+        row[headers[j].trim()] = parseFloat(vals[j]);
+      }
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  function buildPlot(data) {
+    var svg = el('svg', {
+      viewBox: '0 0 ' + W + ' ' + H,
+      preserveAspectRatio: 'xMidYMid meet',
+      role: 'img'
     });
-  }
+    root.appendChild(svg);
 
-  function swatchColor(cls) {
-    return ({
-      'coco-curve-cast': '#8a6d1f',
-      'coco-curve-loki': '#b87333',
-      'coco-curve-revote': '#6b8a3a',
-      'coco-curve-revote-adv': '#2f5b73'
-    })[cls] || '#1a1a1a';
-  }
+    var yTicks = [1, 5, 10, 15, 20, 25, 30, 35];
+    yTicks.forEach(function (t) {
+      el('line', {
+        class: 'coco-grid',
+        x1: M.l, y1: yScale(t), x2: M.l + PLOT_W, y2: yScale(t)
+      }, svg);
+      var lbl = el('text', {
+        class: 'coco-tick',
+        x: M.l - 8, y: yScale(t) + 6,
+        'text-anchor': 'end',
+        'font-size': '18'
+      }, svg);
+      lbl.textContent = (t === 1 ? '1×' : t + '×');
+    });
 
-  // ---------- Animation ----------
-  function drawAll() {
-    paths.forEach((p, i) => {
-      setTimeout(() => {
+    var xTicks = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+    xTicks.forEach(function (t) {
+      el('line', {
+        class: 'coco-grid',
+        x1: xScale(t), y1: M.t, x2: xScale(t), y2: M.t + PLOT_H
+      }, svg);
+      var lbl = el('text', {
+        class: 'coco-tick',
+        x: xScale(t), y: M.t + PLOT_H + 24,
+        'text-anchor': 'middle',
+        'font-size': '18'
+      }, svg);
+      lbl.textContent = t.toFixed(1);
+    });
+
+    el('line', { class: 'coco-axis-line', x1: M.l, y1: M.t, x2: M.l, y2: M.t + PLOT_H }, svg);
+    el('line', { class: 'coco-axis-line', x1: M.l, y1: M.t + PLOT_H, x2: M.l + PLOT_W, y2: M.t + PLOT_H }, svg);
+
+    var xt = el('text', {
+      class: 'coco-axis-title',
+      x: M.l + PLOT_W / 2, y: H - 6,
+      'text-anchor': 'middle',
+      'font-size': '19'
+    }, svg);
+    xt.textContent = 'Target win probability  p';
+
+    var yt = el('text', {
+      class: 'coco-axis-title',
+      x: 16, y: M.t + PLOT_H / 2,
+      'text-anchor': 'middle',
+      'font-size': '19',
+      transform: 'rotate(-90 16 ' + (M.t + PLOT_H / 2) + ')'
+    }, svg);
+    yt.textContent = 'CoCo(p)';
+
+    var paths = [];
+    CURVES.forEach(function (c) {
+      var d = '';
+      for (var i = 0; i < data.length; i++) {
+        var p = data[i].p;
+        var v = Math.max(yMin, Math.min(yMax, data[i][c.key]));
+        var px = xScale(p);
+        var py = yScale(v);
+        d += (i === 0 ? 'M' : 'L') + px.toFixed(2) + ' ' + py.toFixed(2) + ' ';
+      }
+
+      var hitPath = el('path', {
+        fill: 'none',
+        stroke: 'transparent',
+        'stroke-width': 14,
+        class: 'coco-curve-hit'
+      }, svg);
+      hitPath.setAttribute('d', d.trim());
+
+      var path = el('path', {
+        fill: 'none',
+        stroke: c.color,
+        'stroke-width': c.width,
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        'stroke-dasharray': '1000',
+        'stroke-dashoffset': '1000',
+        class: 'coco-curve',
+        'pointer-events': 'none'
+      }, svg);
+      path.setAttribute('d', d.trim());
+
+      var lastRow = data[data.length - 1];
+      var labelY = yScale(Math.max(yMin, Math.min(yMax, lastRow[c.key])));
+      var label = el('text', {
+        x: M.l + PLOT_W + 10,
+        y: labelY + 5,
+        'font-family': 'Inter, sans-serif',
+        'font-size': '17',
+        'font-weight': '600',
+        fill: c.color,
+        opacity: '0',
+        class: 'coco-label'
+      }, svg);
+      label.textContent = c.name;
+      label.style.cursor = 'pointer';
+      hitPath.style.cursor = 'pointer';
+
+      paths.push({ path: path, hitPath: hitPath, label: label, color: c.color, curve: c });
+    });
+
+    paths.forEach(function (p) {
+      var handler = (function (pp) {
+        return function () {
+          if (activeKey === pp.curve.key) {
+            pp.path.setAttribute('stroke-width', pp.curve.width);
+            hideDescription(pp.curve.key);
+          } else {
+            paths.forEach(function (ap) {
+              ap.path.setAttribute('stroke-width', ap.curve.width);
+            });
+            pp.path.setAttribute('stroke-width', pp.curve.width + 2);
+            showDescription('<span style="color:' + pp.color + ';font-weight:700;">' + pp.curve.name + ':</span> ' + pp.curve.desc, pp.curve.key);
+          }
+        };
+      })(p);
+      p.hitPath.addEventListener('click', handler);
+      p.label.addEventListener('click', handler);
+    });
+
+    paths.forEach(function (p) {
+      var len = 0;
+      try { len = p.path.getTotalLength(); } catch (e) { len = 1000; }
+      len = len || 1000;
+      p.path.style.strokeDasharray = len;
+      p.path.style.strokeDashoffset = len;
+    });
+
+    function drawAll() {
+      paths.forEach(function (p, i) {
+        setTimeout(function () {
+          p.path.classList.add('draw');
+          p.path.style.strokeDashoffset = '0';
+        }, 250 + i * 350);
+        setTimeout(function () {
+          p.label.classList.add('show');
+        }, 250 + i * 350 + 1200);
+      });
+    }
+
+    function showFinal() {
+      paths.forEach(function (p) {
         p.path.classList.add('draw');
         p.path.style.strokeDashoffset = '0';
-      }, 250 + i * 350);
-      setTimeout(() => {
         p.label.classList.add('show');
-      }, 250 + i * 350 + 1200);
-    });
-  }
-
-  function showFinal() {
-    paths.forEach(p => {
-      p.path.classList.add('draw');
-      p.path.style.strokeDashoffset = '0';
-      p.label.classList.add('show');
-    });
-  }
-
-  if (prefersReduced) {
-    showFinal();
-    return;
-  }
-
-  let drawn = false;
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !drawn) {
-          drawn = true;
-          drawAll();
-        }
       });
-    }, { threshold: 0.25 });
-    io.observe(root);
-  } else {
-    drawAll();
+    }
+
+    if (prefersReduced) { showFinal(); return; }
+
+    var drawn = false;
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && !drawn) {
+            drawn = true;
+            drawAll();
+          }
+        });
+      }, { threshold: 0.25 });
+      io.observe(root);
+    } else {
+      drawAll();
+    }
   }
+
+  // Load CSV
+  var csvPath = 'figure_paper.csv';
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', csvPath, true);
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      var data = parseCSV(xhr.responseText);
+      buildPlot(data);
+    }
+  };
+  xhr.send();
 })();
