@@ -227,7 +227,10 @@
         Existing definitions in the token-weighted setting diverge sharply depending on whether they focus on leaked weights or leaked ballots, which we have seen can be completely uncorrelated. We instead propose a privacy definition that instead captures leakage through its <em>impact on the election integrity</em>: the more a tally reveals, the easier it is for an adversary to bribe voters into flipping the outcome.
       </p>
       <p>
-        <strong>B&#8209;privacy</strong> is the minimum total bribe an adversary must commit to flip an outcome with high confidence, given only what the published tally reveals. Bribes are enforceable only when the adversary can verify compliance from the tally, so the disclosure rule directly sets the price of influence.
+        <strong>B&#8209;privacy</strong> is the minimum total bribe an adversary must commit to flip an outcome with high confidence, given only what the published tally reveals. An adversary can only condition the bribes on the information revealed by the tally. As seen in the previous section, when adding noise, it is harder for the adversary to know how a specific voter voted, making it harder to verify whether a voter complied with the contract. This uncertainty translates into extra cost for the adversary to successfully overturn the election, and is reflected in a higher B-privacy.
+      </p>
+      <p>
+        We can see below how an adversary would strategize to bribe a specific voter in three different elections with different tally disclosures. One that reveals the exact tally with the individual ballots, another that only reveals the winner, and a third one that reveals a noised tally.
       </p>
 
       <div class="bribe-lab" aria-label="Bribery game in three tally regimes">
@@ -320,27 +323,25 @@
     <section class="section" id="dao-comparison">
       <h2>B&#8209;Privacy Across DAOs</h2>
       <p>
-        We analyze bribery costs across DAOs to understand how B-privacy varies in real governance systems. The chart below shows the average cost multiplier (B-privacy factor) for a representative sample of DAOs when using noised voting compared to public tallies.
+        We compute B-Privacy across multiple DAOs to understand how the choice of the tally disclosure mechanism affects privacy. The chart below shows the relative B-Privacy, that is, the ratio of B-Privacy under a given mechanism to B-Privacy under a raw tally (where there is no privacy), for two tally disclosure mechanisms: only revealing the winner and revealing a noised tally. Each row represents a DAO, and each dot represents the B-Privacy for that DAO under the corresponding mechanism. The baseline (dashed line) represents the raw tally case, where relative B-Privacy is 1.
       </p>
       <div class="dao-plot-wrap">
         <div class="dao-plot" id="dao-chart"></div>
         <p class="caption">
-          B-privacy factor for 10 representative DAOs, ranging from those with minimal privacy benefits (balancer, curve) to extreme cases (aavegotchi, shellprotocol). Red dots show Winner-Only voting; green dots show Tally Perturbation 10% noising. The baseline (dashed line) represents full-disclosure voting with no privacy.
+          B-privacy factor for 10 representative DAOs, ranging from those with minimal privacy benefits (balancer, curve) to extreme cases (aavegotchi, shellprotocol). Red dots show Winner-Only voting; green dots show Tally Perturbation 10% noising. The baseline (dashed line) represents full-disclosure voting with no privacy. 
         </p>
       </div>
     </section>
+
+    <p>
+      The divergence between DAOs with respect to B-Privacy largely rests on the differences in voting weight concentration: DAOs with less concentrated voting power (e.g., aavegotchi) see much higher B-Privacy improvements from noise, while DAOs with more concentrated voting power (e.g., balancer) see almost no privacy improvements when adding noise.
+    </p>
 
 
     <section class="section" id="aavegotchi-results">
       <h2>Case study: B&#8209;Privacy in Aavegotchi</h2>
       <p>
-        To see how B&#8209;privacy behaves on real governance data, we
-        analyse <strong>250 proposals from the Aavegotchi DAO</strong> and
-        measure how relative B&#8209;privacy responds to tally
-        perturbation. We group proposals by their <em>Minimum Decisive
-        Coalition</em> (MDC) &mdash; the smallest set of voters whose
-        combined weight could have changed the outcome &mdash; because
-        proposals with larger MDCs are inherently harder to corrupt.
+        To see how B&#8209;privacy behaves on real governance data, we analyse <strong>250 proposals from the Aavegotchi DAO</strong> and measure how relative B&#8209;privacy responds to tally perturbation. We group proposals by their <em>Minimum Decisive Coalition</em> (MDC) &mdash; the smallest set of voters whose combined weight could have changed the outcome &mdash; because proposals with larger MDCs are inherently harder to corrupt. This metric indirectly captures weight concentration, and allows us to see that proposals with lower weight concentration (e.g. no whales) see much higher B-Privacy improvements from noise.
       </p>
 
       <figure class="aave-figure">
@@ -358,11 +359,8 @@
       </figure>
 
       <p class="caption">
-        Even modest noise pays off: across proposals with MDC&nbsp;&ge;&nbsp;5,
-        the geometric mean of relative B&#8209;privacy improves by
-        <strong>&times;4.1</strong>. For elections with less concentrated voting power, 
-        noise can substantially increase the cost of bribery with <strong>&times;1000</strong> 
-        from just a 2% perturbation in proposals with MDC&nbsp;&ge;&nbsp;30.
+        We see here that the main factor that affects the B-Privacy is the weight distribution. In proposals with low voter concentration, even modest noise pays greatly increases the B-Privacy of the system. For elections with more concentrated voting power, 
+        noise has a weaker effect.
       </p>
     </section>
 

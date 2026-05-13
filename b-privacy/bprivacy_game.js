@@ -25,7 +25,7 @@
     },
     vote: {
       label: 'Alice decides (w = 3)',
-      public: { voter: 'They will see my ballot. If I vote <em>In favour</em>, I will be paid. If I vote <em>Against</em>, I won\'t.' },
+      public: { voter: 'The adversary will see my choice. If I vote <em>In favour</em>, I will be paid. If I vote <em>Against</em>, I won\'t.' },
       noised: { voter: 'The noise hides me. I vote <em>Against</em>. The adversary may still pay me.' },
       private: { voter: 'They only see the winner, not my ballot. I pocket the bribe if <em>In favour</em> wins <em>and</em> still vote <em>Against</em>.' }
     },
