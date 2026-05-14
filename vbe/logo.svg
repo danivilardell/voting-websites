@@ -1,6 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
-  <rect x="6" y="6" width="108" height="108" rx="18" fill="#1a1a1a"/>
-  <path d="M38 30 H66 C76 30 82 36 82 44 C82 50 78 54 73 56 C80 57 86 62 86 70 C86 80 78 86 66 86 H38 Z M50 42 V54 H64 C68 54 70 52 70 48 C70 44 68 42 64 42 Z M50 64 V74 H65 C69 74 72 72 72 69 C72 65 69 64 65 64 Z" fill="#f5f0e6"/>
-  <circle cx="92" cy="86" r="5" fill="#c9a24a"/>
-  <path d="M26 90 H94" stroke="#f5f0e6" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.45"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" fill="none">
+  <rect x="6" y="6" width="308" height="108" rx="18" fill="#1a1a1a"/>
+  <!-- V -->
+  <path d="M28 30 L60 86 L92 30 H78 L60 68 L42 30 Z" fill="#f5f0e6"/>
+  <!-- B -->
+  <path d="M116 30 H144 C154 30 160 36 160 44 C160 50 156 54 151 56 C158 57 164 62 164 70 C164 80 156 86 144 86 H116 Z M128 42 V54 H142 C146 54 148 52 148 48 C148 44 146 42 142 42 Z M128 64 V74 H143 C147 74 150 72 150 69 C150 65 147 64 143 64 Z" fill="#f5f0e6"/>
+  <!-- E -->
+  <path d="M192 30 H248 V42 H204 V52 H240 V64 H204 V74 H250 V86 H192 Z" fill="#f5f0e6"/>
+  <circle cx="260" cy="86" r="5" fill="#c9a24a"/>
+  <path d="M22 90 H298" stroke="#f5f0e6" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.45"/>
 </svg>
