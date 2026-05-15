@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="style.css" />
   <script src="ctc_demo.js" defer></script>
   <script src="timeline.js" defer></script>
-  <script src="voter_sim.js" defer></script>
+  <script src="bribe_game.js" defer></script>
   <script src="coco_plot.js" defer></script>
 </head>
 <body>
@@ -176,32 +176,26 @@
         To enable comparison across different CR definitions and design approaches, we introduce <strong>CoCo</strong> (Cost of Coercion), a protocol-agnostic metric that quantifies CR game-theoretically. It measures the <em>economic cost</em> to an adversary of achieving a desired voting outcome with a target probability <code>p</code>, normalized by the same cost for a non-CR scheme. Higher CoCo means stronger practical CR.
       </p>
       <p>
-        CoCo is built on a coercion game that models how rational voters respond to bribes. Each voter chooses to <strong>ignore</strong> the bribe, <strong>cooperate</strong> with the adversary, or <strong>defect</strong> (accept the bribe but attempt to evade). The voter's choice depends on the bribe amount, their pivotality, and the protocol's evasion success and detection probabilities.
+        CoCo is built on a coercion game that models how rational voters respond to bribes. Each voter chooses to <strong>ignore</strong> the bribe (vote honestly), <strong>cooperate</strong> (accept the bribe and vote as instructed), or <strong>defect</strong> (accept the bribe but secretly try to vote their true preference). The voter's choice depends on the bribe amount, their <em>pivotality</em> (probability their vote swings the outcome), the protocol's <em>evasion success probability</em> (how reliably defection works), and a <em>detection gap</em> &mdash; how much more likely the adversary is to pay a voter who truly cooperated versus one who defected. A small detection gap means the adversary can barely distinguish compliance from evasion, so they must bribe as if everyone will defect.
       </p>
 
-      <div class="voter-sim-wrap">
-        <h3 class="voter-sim-title">Single-voter coercion game</h3>
-        <p class="voter-sim-desc">
-          Explore how a rational voter responds to bribes under different protocol parameters. The voter has unit utility for their preferred outcome and chooses whichever action maximizes their expected utility.
-        </p>
-        <div class="voter-sim-layout">
-          <div class="voter-sim-controls" id="voter-sim-controls"></div>
-          <div class="voter-sim-chart" id="voter-sim-chart"></div>
-        </div>
+      <div class="bribe-game-wrap" id="bribe-game-wrap">
+        <h3 class="bribe-game-title">Coercion Game</h3>
+        <p class="bribe-game-desc">The protocol parameters below are fixed by the voting system. Configure them to reflect a scheme of interest, then act as the adversary: choose a bribe amount and offer it. A rational voter responds based on their privately drawn utility. Notice what you can and cannot observe.</p>
       </div>
 
       <p>
-        By simulating this game across an electorate of many voters, we can compute the total cost an adversary must pay to achieve a target win probability <code>p</code>. Normalizing by the cost without any CR gives the <strong>CoCo</strong> curve for each protocol:
+        By simulating this game across an electorate of many voters, we can compute the total cost an adversary must pay to achieve a target win probability <code>p</code>. Normalizing by the cost for a protocol with <em>no</em> coercion resistance &mdash; one where evasion never works and the adversary can perfectly verify compliance &mdash; gives the <strong>CoCo</strong> curve. A value of <code>k&times;</code> means the adversary must spend <code>k</code> times more than against a protocol with no CR. Click a curve for its protocol parameters:
       </p>
 
       <div class="coco-plot-wrap">
         <p class="coco-caption">Simulation: 100 equal-weight voters &nbsp;&middot;&nbsp; 25% initially prefer <em>yes</em>, 75% prefer <em>no</em></p>
         <div class="coco-plot" data-plot="coco" aria-label="Cost of Coercion across protocols"></div>
-        <div class="coco-description">Click a curve or label to see its parameters.</div>
+        <div class="coco-description">Click a curve or label to see its parameters and threat model.</div>
       </div>
 
       <p>
-        The most striking result is that deniable revoting with a coin-flip race collapses to <code>CoCo &approx; 1</code>: a voter who expects to defect successfully half the time accepts a bribe half as large, so the adversary's per-voter cost is nearly unchanged from the non-CR baseline. Cast Iron achieves a flat <strong>25&times;</strong> across all <code>p</code>, the adversary's cost depends only on the detection gap. Practical CR cannot be summarized by a single number &mdash; the adversary's cost varies across regimes, and CoCo makes these tradeoffs visible.
+        The most striking result is that deniable revoting with a coin-flip race collapses to <code>CoCo &approx; 1</code>: a voter expecting to evade half the time accepts a bribe roughly half as large for the same expected utility, so the adversary's per-voter cost is nearly unchanged from the no-CR baseline. Cast Iron achieves a flat <strong>25&times;</strong> across all <code>p</code> &mdash; when evasion always succeeds (&gamma;&nbsp;=&nbsp;1), there is an exact analytical formula <code>CoCo = 1 / (&alpha;&minus;&beta;)</code> where &alpha;&minus;&beta; is the detection gap, so the adversary's cost is entirely determined by how reliably they can tell cooperators from defectors, regardless of the target win probability. Revoting with a voter network-latency advantage stays near 1&times; for low win-probability targets but rises sharply near certainty, peaking around 30&times;. Loki, with higher evasion success but a larger detection surface, climbs approximately linearly to ~12&times; at <code>p = 1</code>. A key takeaway: practical CR cannot be summarized by a single number, and which protocol is cheapest to attack depends on the win-probability regime an operator cares about.
       </p>
     </section>
 

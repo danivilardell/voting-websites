@@ -24,8 +24,8 @@
   var sliderDefs = [
     { key: 'delta',   label: 'Pivotality',          min: 0, max: 1, step: 0.01 },
     { key: 'epsilon', label: 'Evasion success',      min: 0, max: 1,   step: 0.01 },
-    { key: 'p_c',     label: 'P(bribe | cooperate)', min: 0, max: 1,   step: 0.01 },
-    { key: 'p_d',     label: 'P(bribe | defect)',    min: 0, max: 1,   step: 0.01 }
+    { key: 'p_c',     label: 'Paid if cooperate (α)', min: 0, max: 1,   step: 0.01 },
+    { key: 'p_d',     label: 'Paid if defect (β)',    min: 0, max: 1,   step: 0.01 }
   ];
 
   // ---------- Build sliders ----------

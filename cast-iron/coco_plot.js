@@ -65,7 +65,7 @@
     if (!descBox) return;
     if (activeKey !== key) return;
     activeKey = null;
-    descBox.innerHTML = 'Click a curve or label to see its parameters.';
+    descBox.innerHTML = 'Click a curve or label to see its parameters and threat model.';
     descBox.classList.remove('visible');
   }
 
